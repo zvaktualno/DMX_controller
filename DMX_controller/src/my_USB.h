@@ -4,13 +4,13 @@
 #define USB_MASTER 	0   	/* komunikacijska adresa master-ja */
 #define USB_BCAST  	0x7F  	/* broadcast adresa */
 #define USB_RxMAXLEN 	128   	/* max. dolzina sporocila (rx) */
-#define USB_TxMAXLEN 	240  	/* max. dolzina sporocila (tx) */
+#define USB_TxMAXLEN 	300  	/* max. dolzina sporocila (tx) */
 #define USB_STX  	0x55  	/* STX znak */
 #define USB_ETX  	0xAA  	/* ETX znak */
 #define USB_ADDR 0xFF
 void configure_USB(void);
 uint16_t USB_CalcCrc (unsigned char *msg, unsigned char length);
-void USB_SendMessage (unsigned char *s, unsigned char length);
+void USB_SendMessage (unsigned char *s, uint16_t length);
 unsigned char *USB_GetMessage (unsigned char *Raddr, unsigned char *Saddr, unsigned char *length);
 void USB_ReceiveEnable(void);
 void USB_ReceiveDisable(void);

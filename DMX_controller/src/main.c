@@ -22,6 +22,10 @@ typedef enum {
 MODE device_mode;
 int main (void) {
     system_init();
+    uint8_t dmx_channels[256];
+    for(uint16_t i = 0; i < 256; i++) {
+        dmx_channels[i] = i;
+    }
     /*configure_tcc0();
     configure_tcc0_callbacks(&channel0, &channel1, &channel2, &channel3, &channel4);*/
     /*configure_adc0();
@@ -37,8 +41,8 @@ int main (void) {
         if(device_mode == TRIGGER || device_mode == BOTH) {
             BREAKPOINT;
             uint8_t dmx_values[] = {1, 2, 3, 4, 5};
-            USB_SendMessage(dmx_values, 5);
+            USB_SendMessage(dmx_channels, 256);
         }
-        delay_ms(2000);
+        delay_ms(100);
     }
 }

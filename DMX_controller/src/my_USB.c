@@ -21,7 +21,7 @@ void configure_USB(void) {
 
     usart_get_config_defaults(&config_usart);
 
-    config_usart.baudrate    =					56000;
+    config_usart.baudrate    =					31500;
     //config_usart.transfer_mode =				USART_TRANSFER_ASYNCHRONOUSLY;
     config_usart.mux_setting =					USART_RX_3_TX_2_XCK_3;
     //config_usart.character_size =				USART_CHARACTER_SIZE_8BIT;
@@ -29,7 +29,7 @@ void configure_USB(void) {
     config_usart.pinmux_pad1 =					PINMUX_PB11D_SERCOM4_PAD3;
     config_usart.pinmux_pad2 =					PINMUX_UNUSED;
     config_usart.pinmux_pad3 =					PINMUX_UNUSED;
-    config_usart.stopbits =						USART_STOPBITS_2;
+    config_usart.stopbits =						USART_STOPBITS_1;
     config_usart.parity =						USART_PARITY_NONE;
     config_usart.generator_source =				GCLK_GENERATOR_3;
     config_usart.start_frame_detection_enable = true;
@@ -62,23 +62,24 @@ uint16_t USB_CalcCrc (unsigned char *msg, unsigned char length) {
 // formira in poslje slave message
 // opremi z STX Saddr Raddr len msg CRC16 ETX+
 
-void USB_SendMessage (unsigned char *p_string, unsigned char length) {
+void USB_SendMessage (unsigned char *p_string, uint16_t length) {
 
-    char transmit_message[USB_TxMAXLEN + 8];
+    char transmit_message[USB_TxMAXLEN + 6];
     char *p_to_msg_start, *p_to_msg_last;
     uint16_t crc;
     p_to_msg_last = p_to_msg_start = transmit_message;
     *(p_to_msg_last++) = USB_STX;
     *(p_to_msg_last++) = USB_MASTER;  // source: our address
     *(p_to_msg_last++) = USB_ADDR; // destination: 0 = PC
-    *(p_to_msg_last++) = length;   // block length
+    *(p_to_msg_last++) = length >> 8; // block length
+    *(p_to_msg_last++) = length & 0xFF; // block length
 
     // copy message to output buffer
-    for (uint8_t n = 0; n < length; n++) *(p_to_msg_last++) = *(p_string + n);
-
-    crc = USB_CalcCrc(p_to_msg_start + 1, length + 3);
-    *(p_to_msg_last++) = (unsigned char)(crc >> 8); // CRC MSB
-    *(p_to_msg_last++) = (unsigned char)(crc & 0xFF); // CRC LSB
+    for (uint16_t n = 0; n < length; n++) *(p_to_msg_last++) = *(p_string + n);
+    /*
+        crc = USB_CalcCrc(p_to_msg_start + 1, length + 3);
+        *(p_to_msg_last++) = (unsigned char)(crc >> 8); // CRC MSB
+        *(p_to_msg_last++) = (unsigned char)(crc & 0xFF); // CRC LSB*/
     *(p_to_msg_last++) = USB_ETX;  // ETX
 
     while(usart_write_buffer_job(&USB_instance, p_to_msg_start, p_to_msg_last - p_to_msg_start) != STATUS_OK);
