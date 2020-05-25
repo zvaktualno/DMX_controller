@@ -22,9 +22,9 @@ void configure_USB(void) {
     usart_get_config_defaults(&config_usart);
 
     config_usart.baudrate    =					31500;
-    //config_usart.transfer_mode =				USART_TRANSFER_ASYNCHRONOUSLY;
+    config_usart.transfer_mode =				USART_TRANSFER_ASYNCHRONOUSLY;
     config_usart.mux_setting =					USART_RX_3_TX_2_XCK_3;
-    //config_usart.character_size =				USART_CHARACTER_SIZE_8BIT;
+    config_usart.character_size =				USART_CHARACTER_SIZE_8BIT;
     config_usart.pinmux_pad0 =					PINMUX_PB10D_SERCOM4_PAD2;
     config_usart.pinmux_pad1 =					PINMUX_PB11D_SERCOM4_PAD3;
     config_usart.pinmux_pad2 =					PINMUX_UNUSED;
