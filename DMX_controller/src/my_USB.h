@@ -31,6 +31,10 @@ typedef enum {
     USB_END,
 } USB_STATE;
 
-
+#define MIDI_NOTE_OFF_MASK 0x80
+#define MIDI_NOTE_ON_MASK 0x90
+#define MIDI_CONTROL_CHANGE_MASK 0xB0
+#define MIDI_PROGRAM_CHNAGE_MASK 0xC0
+#define MIDI_PITCH_CHANGE_MASK 0xE0
 
 #endif /* REC_USB_H_ */
