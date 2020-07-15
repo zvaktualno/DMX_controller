@@ -34,14 +34,14 @@ void configure_i2c(void) {
     i2c_master_get_config_defaults(&config_i2c_master);
 
     /* Change buffer timeout to something longer */
-    config_i2c_master.buffer_timeout	= 10000;
-    config_i2c_master.pinmux_pad0		= TWI_SDA_PINMUX;
-    config_i2c_master.pinmux_pad1		= TWI_SCL_PINMUX;
+    config_i2c_master.buffer_timeout	= I2C_TIMEOUT;
+    config_i2c_master.pinmux_pad0		= I2C_SDA_PINMUX;
+    config_i2c_master.pinmux_pad1		= I2C_SCL_PINMUX;
     config_i2c_master.generator_source	= GCLK_GENERATOR_2;
     config_i2c_master.start_hold_time	= I2C_MASTER_START_HOLD_TIME_300NS_600NS;
-    config_i2c_master.baud_rate			= I2C_MASTER_BAUD_RATE_100KHZ;
+    config_i2c_master.baud_rate			= I2C_BAUDRATE;
     /* Initialize and enable device with config */
-    while(i2c_master_init(&i2c_master_instance, TWI_MODULE, &config_i2c_master) != STATUS_OK);
+    while(i2c_master_init(&i2c_master_instance, I2C_MODULE, &config_i2c_master) != STATUS_OK);
 
     i2c_master_enable(&i2c_master_instance);
 }

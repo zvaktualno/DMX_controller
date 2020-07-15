@@ -7,6 +7,7 @@ uint8_t USB_TxBuf[USB_TxMAXLEN + 8];
 
 uint8_t USB_flags;
 
+
 struct usart_module USB_instance;
 volatile uint16_t c;
 

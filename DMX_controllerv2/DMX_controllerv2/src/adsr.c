@@ -4,6 +4,7 @@
 #include "config.h"
 
 #define MAX_32BIT_VALUE 0xFFFFFFFF
+
 void process_ADSR(ADSR *adsr) {
     switch(adsr->state) {
         case START:

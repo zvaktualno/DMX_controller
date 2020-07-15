@@ -19,7 +19,7 @@ void configure_adc0(void) {
     config_adc.window.window_mode            = ADC_WINDOW_MODE_ABOVE_LOWER;
     config_adc.window.window_upper_value     = 150;
     config_adc.window.window_lower_value     = 900;
-    config_adc.positive_input                = ADC_PIN;
+    config_adc.positive_input                = ADC_POSITIVE_INPUT_PIN7;
     config_adc.negative_input                = ADC_NEGATIVE_INPUT_GND;
     config_adc.left_adjust                   = false;
     config_adc.freerunning                   = true;
@@ -46,4 +46,13 @@ void adc0_window_callback(void) {
 
 void adc0_set_compare_value(uint8_t value) {
     adc_set_window_mode(&adc0_instance, ADC_WINDOW_MODE_BELOW_UPPER, 1100, 150);
+}
+void adc0_change_channel(uint8_t channel) {
+    const enum adc_positive_input adc_pin[12] = {ADC_POSITIVE_INPUT_PIN7,
+                                                 ADC_POSITIVE_INPUT_PIN6,
+                                                 ADC_POSITIVE_INPUT_PIN5,
+                                                 ADC_POSITIVE_INPUT_PIN4,
+                                                 ADC_POSITIVE_INPUT_PIN1,
+                                                };
+    adc_set_positive_input(&adc0_instance, adc_pin[channel]);
 }
