@@ -46,6 +46,7 @@
     <option id="sam0.drivers.tcc" value="Add" config="callback" content-id="Atmel.ASF" />
     <option id="sam0.services.rww_eeprom_emulator" value="Add" config="" content-id="Atmel.ASF" />
     <option id="sam0.utils.stdio.stdio_serial" value="Add" config="" content-id="Atmel.ASF" />
+    <option id="sam0.drivers.wdt" value="Add" config="callback" content-id="Atmel.ASF" />
     <option id="sam0.utils.linker_scripts" value="Add" config="" content-id="Atmel.ASF" />
   </options>
   <configurations />
@@ -270,6 +271,12 @@
     <file path="src/ASF/sam0/utils/stdio/write.c" framework="" version="3.46.0" source="sam0\utils\stdio\write.c" changed="False" content-id="Atmel.ASF" />
     <file path="src/ASF/common2/services/delay/sam0/cycle_counter.c" framework="" version="3.46.0" source="common2\services\delay\sam0\cycle_counter.c" changed="False" content-id="Atmel.ASF" />
     <file path="src/ASF/common2/services/delay/sam0/cycle_counter.h" framework="" version="3.46.0" source="common2\services\delay\sam0\cycle_counter.h" changed="False" content-id="Atmel.ASF" />
+    <file path="src/ASF/sam0/drivers/wdt/wdt_callback.c" framework="" version="3.46.0" source="sam0\drivers\wdt\wdt_callback.c" changed="False" content-id="Atmel.ASF" />
+    <file path="src/ASF/sam0/drivers/wdt/wdt.c" framework="" version="3.46.0" source="sam0\drivers\wdt\wdt.c" changed="False" content-id="Atmel.ASF" />
+    <file path="src/ASF/sam0/drivers/wdt/wdt_callback.h" framework="" version="3.46.0" source="sam0\drivers\wdt\wdt_callback.h" changed="False" content-id="Atmel.ASF" />
+    <file path="src/ASF/sam0/drivers/wdt/wdt.h" framework="" version="3.46.0" source="sam0\drivers\wdt\wdt.h" changed="False" content-id="Atmel.ASF" />
+    <file path="src/ASF/sam0/drivers/wdt/quick_start/qs_wdt_basic.h" framework="" version="3.46.0" source="sam0\drivers\wdt\quick_start\qs_wdt_basic.h" changed="False" content-id="Atmel.ASF" />
+    <file path="src/ASF/sam0/drivers/wdt/quick_start_callback/qs_wdt_callback.h" framework="" version="3.46.0" source="sam0\drivers\wdt\quick_start_callback\qs_wdt_callback.h" changed="False" content-id="Atmel.ASF" />
   </files>
   <documentation help="http://asf.atmel.com/docs/3.46.0/common.applications.user_application.sam0_system.user_board.atsamc21j18a/html/index.html" />
   <offline-documentation help="" />
@@ -301,6 +308,7 @@
       <Value>TCC_ASYNC=true</Value>
       <Value>I2C_MASTER_CALLBACK_MODE=true</Value>
       <Value>CYCLE_MODE</Value>
+      <Value>WDT_CALLBACK_MODE=true</Value>
     </ListValues>
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
@@ -346,6 +354,7 @@
       <Value>../src/ASF/common2/services/delay/sam0</Value>
       <Value>../src/ASF/sam0/utils/stdio/stdio_serial</Value>
       <Value>../src/ASF/common/services/serial</Value>
+      <Value>../src/ASF/sam0/drivers/wdt</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize for size (-Os)</armgcc.compiler.optimization.level>
@@ -410,9 +419,10 @@
       <Value>../src/ASF/common2/services/delay/sam0</Value>
       <Value>../src/ASF/sam0/utils/stdio/stdio_serial</Value>
       <Value>../src/ASF/common/services/serial</Value>
+      <Value>../src/ASF/sam0/drivers/wdt</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
-  <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=USER_BOARD -DADC_CALLBACK_MODE=true -DDAC_CALLBACK_MODE=true -DUSART_CALLBACK_MODE=true -DTC_ASYNC=true -DTCC_ASYNC=true -DI2C_MASTER_CALLBACK_MODE=true -DCYCLE_MODE</armgcc.preprocessingassembler.general.AssemblerFlags>
+  <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=USER_BOARD -DADC_CALLBACK_MODE=true -DDAC_CALLBACK_MODE=true -DUSART_CALLBACK_MODE=true -DTC_ASYNC=true -DTCC_ASYNC=true -DI2C_MASTER_CALLBACK_MODE=true -DCYCLE_MODE -DWDT_CALLBACK_MODE=true</armgcc.preprocessingassembler.general.AssemblerFlags>
   <armgcc.preprocessingassembler.general.IncludePaths>
     <ListValues>
       <Value>../src/ASF/common/boards</Value>
@@ -456,6 +466,7 @@
       <Value>../src/ASF/common2/services/delay/sam0</Value>
       <Value>../src/ASF/sam0/utils/stdio/stdio_serial</Value>
       <Value>../src/ASF/common/services/serial</Value>
+      <Value>../src/ASF/sam0/drivers/wdt</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
 </ArmGcc>
@@ -481,6 +492,7 @@
       <Value>TCC_ASYNC=true</Value>
       <Value>I2C_MASTER_CALLBACK_MODE=true</Value>
       <Value>CYCLE_MODE</Value>
+      <Value>WDT_CALLBACK_MODE=true</Value>
     </ListValues>
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
@@ -526,6 +538,7 @@
       <Value>../src/ASF/common2/services/delay/sam0</Value>
       <Value>../src/ASF/sam0/utils/stdio/stdio_serial</Value>
       <Value>../src/ASF/common/services/serial</Value>
+      <Value>../src/ASF/sam0/drivers/wdt</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize (-O1)</armgcc.compiler.optimization.level>
@@ -591,10 +604,11 @@
       <Value>../src/ASF/common2/services/delay/sam0</Value>
       <Value>../src/ASF/sam0/utils/stdio/stdio_serial</Value>
       <Value>../src/ASF/common/services/serial</Value>
+      <Value>../src/ASF/sam0/drivers/wdt</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
   <armgcc.assembler.debugging.DebugLevel>Default (-g)</armgcc.assembler.debugging.DebugLevel>
-  <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=USER_BOARD -DADC_CALLBACK_MODE=true -DDAC_CALLBACK_MODE=true -DUSART_CALLBACK_MODE=true -DTC_ASYNC=true -DTCC_ASYNC=true -DI2C_MASTER_CALLBACK_MODE=true -DCYCLE_MODE</armgcc.preprocessingassembler.general.AssemblerFlags>
+  <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=USER_BOARD -DADC_CALLBACK_MODE=true -DDAC_CALLBACK_MODE=true -DUSART_CALLBACK_MODE=true -DTC_ASYNC=true -DTCC_ASYNC=true -DI2C_MASTER_CALLBACK_MODE=true -DCYCLE_MODE -DWDT_CALLBACK_MODE=true</armgcc.preprocessingassembler.general.AssemblerFlags>
   <armgcc.preprocessingassembler.general.IncludePaths>
     <ListValues>
       <Value>../src/ASF/common/boards</Value>
@@ -638,6 +652,7 @@
       <Value>../src/ASF/common2/services/delay/sam0</Value>
       <Value>../src/ASF/sam0/utils/stdio/stdio_serial</Value>
       <Value>../src/ASF/common/services/serial</Value>
+      <Value>../src/ASF/sam0/drivers/wdt</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
   <armgcc.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</armgcc.preprocessingassembler.debugging.DebugLevel>
@@ -704,6 +719,9 @@
     <Folder Include="src\ASF\sam0\drivers\tcc\quick_start_timer\" />
     <Folder Include="src\ASF\sam0\drivers\tc\" />
     <Folder Include="src\ASF\sam0\drivers\tc\tc_sam_l_c\" />
+    <Folder Include="src\ASF\sam0\drivers\wdt\" />
+    <Folder Include="src\ASF\sam0\drivers\wdt\quick_start\" />
+    <Folder Include="src\ASF\sam0\drivers\wdt\quick_start_callback\" />
     <Folder Include="src\ASF\sam0\services\" />
     <Folder Include="src\ASF\sam0\services\eeprom\" />
     <Folder Include="src\ASF\sam0\services\eeprom\emulator\" />
@@ -776,6 +794,24 @@
       <SubType>compile</SubType>
     </Compile>
     <None Include="src\ASF\sam0\services\eeprom\emulator\rwwee_array\quick_start\qs_emulator_basic.h">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="src\ASF\sam0\drivers\wdt\quick_start\qs_wdt_basic.h">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="src\ASF\sam0\drivers\wdt\quick_start_callback\qs_wdt_callback.h">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\ASF\sam0\drivers\wdt\wdt.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\ASF\sam0\drivers\wdt\wdt.h">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\ASF\sam0\drivers\wdt\wdt_callback.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\ASF\sam0\drivers\wdt\wdt_callback.h">
       <SubType>compile</SubType>
     </None>
     <Compile Include="src\ASF\sam0\services\eeprom\emulator\rwwee_array\rww_eeprom.c">

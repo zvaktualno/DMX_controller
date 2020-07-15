@@ -52,6 +52,10 @@
  * running the ASF driver selector tool. Any changes will be discarded.
  */
 
+// From module: AC - Analog Comparator (Callback APIs)
+#include <ac.h>
+#include <ac_callback.h>
+
 // From module: ADC - Analog-to-Digital Converter (Callback APIs)
 #include <adc.h>
 #include <adc_callback.h>
@@ -120,16 +124,8 @@
 // From module: SYSTEM - Reset Management for SAM C20/C21
 #include <reset.h>
 
-// From module: Sleep manager - SAMC implementation
-#include <samc/sleepmgr.h>
-#include <sleepmgr.h>
-
 // From module: Standard serial I/O (stdio)
 #include <stdio_serial.h>
-
-// From module: TC - Timer Counter (Callback APIs)
-#include <tc.h>
-#include <tc_interrupt.h>
 
 // From module: TCC - Timer Counter for Control Applications (Callback APIs)
 #include <tcc.h>
@@ -137,9 +133,5 @@
 
 // From module: USART - Serial interface- SAM implementation for devices with only USART
 #include <serial.h>
-
-// From module: WDT - Watchdog Timer (Callback APIs)
-#include <wdt.h>
-#include <wdt_callback.h>
 
 #endif // ASF_H
