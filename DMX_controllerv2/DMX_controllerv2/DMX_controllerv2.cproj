@@ -742,6 +742,12 @@
     <Compile Include="src\ASF\sam0\drivers\sercom\i2c\i2c_sam0\i2c_master_interrupt.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\DMX.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\DMX.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\i2c_fs.c">
       <SubType>compile</SubType>
     </Compile>
@@ -940,10 +946,10 @@
     <Compile Include="src\my_i2c.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\my_USB.c">
+    <Compile Include="src\USB.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\my_USB.h">
+    <Compile Include="src\USB.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\timers.c">

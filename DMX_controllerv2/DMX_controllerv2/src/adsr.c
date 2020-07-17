@@ -57,3 +57,6 @@ void process_ADSR(ADSR *adsr) {
             break;
     }
 }
+uint8_t get_ADSR_value(ADSR *adsr) {
+    return adsr->value >> 24;
+}

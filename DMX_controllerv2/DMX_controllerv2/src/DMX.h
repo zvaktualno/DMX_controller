@@ -1,22 +1,28 @@
-#ifndef REC_USB_H_
-#define REC_USB_H_
+#ifndef _DMX_H_
+#define _DMX_H_
 
-#define	USB_RXR 1
-#define USB_EN 3
-#define USB_RX_EN 4
+#define	DMX_RXR 1
+#define	DMX_TXR 2
+#define DMX_EN 3
+#define DMX_RX_EN 4
 
-#define USB_TxMAXLEN 512
-#define USB_RxMAXLEN 512
+#define DMX_TxMAXLEN 512
+#define DMX_RxMAXLEN 512
 
-void configure_USB(void);
-void USB_SendMessage (uint8_t *p_string, uint16_t length);
-void USB_ReceiveEnable(void);
-void USB_ReceiveDisable(void);
-uint8_t USB_ReceiveCheck(void);
-uint8_t *USB_get_tx_buf(void);
-unsigned char *USB_get_rx_buf(void);
-void configure_USB_callbacks(void);
+
+void configure_DMX(void);
+void DMX_SendMessage (uint8_t *p_string, uint16_t length);
+
+void DMX_recieve_enable(void);
+void DMX_recieve_disable(void);
+void DMX_transmit_enable(void);
+void DMX_transmit_disable(void);
+uint8_t DMX_transmit_ready(void);
+uint8_t DMX_recieve_ready(void);
+uint8_t *DMX_get_tx_buf(void);
+unsigned char *DMX_get_rx_buf(void);
+void configure_DMX_callbacks(void);
 void usart_read_callback(struct usart_module *const usart_module);
-void USB_change_baudrate(uint16_t baud);
+void DMX_change_baudrate(uint16_t baud);
 
 #endif

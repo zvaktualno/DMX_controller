@@ -6,6 +6,11 @@
 #include "timers.h"
 struct tcc_module tcc0_instance;
 ADSR *a0, *a1, *a2, *a3, *a4;
+uint32_t proc_millis = 0;
+
+uint32_t millis(void) {
+    return proc_millis;
+}
 
 void configure_tcc0(void) {
     struct tcc_config config_tcc;
@@ -37,5 +42,5 @@ void timer0_compare_callback(struct tcc_module *const module_inst) {
     process_ADSR(a2);
     process_ADSR(a3);
     process_ADSR(a4);
-
+    proc_millis++;
 }

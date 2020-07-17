@@ -20,6 +20,7 @@ typedef enum {
 } ADSR_STATE;
 
 typedef struct {
+    uint8_t *p_to_var;
     uint32_t value;				//32-bit output value
     uint32_t interval;			//process()'s period of calling
     uint32_t attack;			//time in millis
@@ -35,5 +36,6 @@ typedef struct {
 } ADSR;
 
 void process_ADSR(ADSR *adsr);
+uint8_t get_ADSR_value(ADSR *adsr);
 
 #endif /* ADSR_H_ */
