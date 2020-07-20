@@ -18,7 +18,7 @@ typedef enum {
 
 MODE device_mode;
 MODE select_device_mode(uint8_t mode);
-
+void IO_init(void);
 void NMI_Handler(void) {
     BREAKPOINT;
 }
@@ -180,4 +180,63 @@ MODE select_device_mode(uint8_t mode) {
         default:
             return DMX;
     }
+}
+
+void IO_init(void) {
+    //configure all ports!
+    struct port_config input_pin_no_pullup;
+    port_get_config_defaults(&input_pin_no_pullup);
+    input_pin_no_pullup.direction = PORT_PIN_DIR_INPUT;
+    input_pin_no_pullup.input_pull = PORT_PIN_PULL_NONE;
+
+    struct port_config input_pin_pullup;
+    port_get_config_defaults(&input_pin_pullup);
+    input_pin_pullup.direction = PORT_PIN_DIR_INPUT;
+    input_pin_pullup.input_pull = PORT_PIN_PULL_UP;
+
+    struct port_config output_pin;
+    port_get_config_defaults(&output_pin);
+    output_pin.direction = PORT_PIN_DIR_OUTPUT;
+    struct port_config output_pin_w_readback;
+    port_get_config_defaults(&output_pin_w_readback);
+    output_pin_w_readback.direction = PORT_PIN_DIR_OUTPUT_WTH_READBACK;
+    /* DEFINE PINS WITH PULLUPS */
+    port_pin_set_config(PIN_SW1, &input_pin_pullup);
+    port_pin_set_config(PIN_SW2, &input_pin_pullup);
+
+    /* DEFINE PINS WITHOUT PULLUPS */
+    port_pin_set_config(PIN_ENC_B, &input_pin_no_pullup);
+    port_pin_set_config(PIN_ENC_A, &input_pin_no_pullup);
+
+    /* DEFINE OUTPUT PINS */
+    port_pin_set_config(PIN_EEPROM_WP, &output_pin);
+    port_pin_set_config(PIN_LED_POWER, &output_pin);
+    port_pin_set_config(PIN_LCD_D0, &output_pin);
+    port_pin_set_config(PIN_LCD_D1, &output_pin);
+    port_pin_set_config(PIN_LCD_D2, &output_pin);
+    port_pin_set_config(PIN_LCD_D3, &output_pin);
+    port_pin_set_config(PIN_LCD_D4, &output_pin);
+    port_pin_set_config(PIN_LCD_D5, &output_pin);
+    port_pin_set_config(PIN_LCD_D6, &output_pin);
+    port_pin_set_config(PIN_LCD_D7, &output_pin);
+    port_pin_set_config(PIN_LCD_EN, &output_pin);
+    port_pin_set_config(PIN_LCD_RW, &output_pin);
+    port_pin_set_config(PIN_LCD_RS, &output_pin);
+    port_pin_set_config(PIN_LCD_BL, &output_pin);
+
+    struct system_pinmux_config mux_config;
+    system_pinmux_get_config_defaults(&mux_config);
+    mux_config.mux_position = MUX_ADC0;
+    mux_config.direction = SYSTEM_PINMUX_PIN_DIR_INPUT;
+    system_pinmux_pin_set_config(PIN_ADC0, &mux_config);
+
+    mux_config.mux_position = MUX_ADC1;
+    system_pinmux_pin_set_config(PIN_ADC1, &mux_config);
+    mux_config.mux_position = MUX_ADC2;
+    system_pinmux_pin_set_config(PIN_ADC2, &mux_config);
+    mux_config.mux_position = MUX_ADC3;
+    system_pinmux_pin_set_config(PIN_ADC3, &mux_config);
+    mux_config.mux_position = MUX_ADC4;
+    system_pinmux_pin_set_config(PIN_ADC4, &mux_config);
+
 }
