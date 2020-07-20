@@ -40,12 +40,19 @@
 #define LCD_D7_PIN 60
 #define LCD_EN_PIN 10
 #define LCD_RW_PIN 12
-#define LCD_RS_PIN 11
+#define LCD_RS_PIN 1
+
+typedef struct {
+    uint32_t ch, A, D, S, R;
+    float level;
+} channel;
 
 typedef struct {
     char preset_name[10];
     uint16_t position;
     uint8_t channels[512];
+    channel ch;
 } PRESET;
+
 
 #endif

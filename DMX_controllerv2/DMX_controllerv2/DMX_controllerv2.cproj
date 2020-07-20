@@ -946,6 +946,12 @@
     <Compile Include="src\my_i2c.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\my_menu.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\my_menu.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\USB.c">
       <SubType>compile</SubType>
     </Compile>
