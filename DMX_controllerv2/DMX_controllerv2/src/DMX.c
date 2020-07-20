@@ -39,10 +39,10 @@ void configure_DMX(void) {
 
 
 void DMX_SendMessage (uint8_t *p_string, uint16_t length) {
-    DMX_change_baudrate(100000)
+    DMX_change_baudrate(100000);
     uint8_t null_var = 0;
     DMX_transmit_disable();
-    while(usart_write_buffer_job(&DMX_instance, null_var, 1) != STATUS_OK);
+    while(usart_write_buffer_job(&DMX_instance, &null_var, 1) != STATUS_OK);
     while(usart_get_job_status(&DMX_instance, USART_TRANSCEIVER_TX) != STATUS_OK);
     DMX_change_baudrate(250000);
     DMX_transmit_disable();
@@ -52,7 +52,7 @@ void DMX_SendMessage (uint8_t *p_string, uint16_t length) {
 
 
 void DMX_transmit_callback(struct usart_module *const usart_module) {
-    USB_transmit_enable();
+    DMX_transmit_enable();
 }
 
 void DMX_recieve_enable(void) {

@@ -17,6 +17,7 @@
 #define DMX_TX_PINMUX 255
 #define DMX_RX_PINMUX 255
 #define DMX_MODULE SERCOM5
+#define MAX_DMX_CHANNELS 256
 
 /* I2C definitions */
 #define I2C_MODULE SERCOM3
@@ -46,7 +47,10 @@ typedef struct {
     uint32_t ch, A, D, S, R;
     float level;
 } channel;
-
+typedef enum {
+    SCROLL,
+    EDIT,
+} STATE ;
 typedef struct {
     char preset_name[10];
     uint16_t position;

@@ -3,10 +3,10 @@
 #ifndef _MY_MENU_H_
 #define _MY_MENU_H_
 
-
+#define MENU_MAX_ITEMS 17
 
 enum VAR_TYPE {
-    UINT8, UINT16, UINT32, FLOAT,TYPE_MENU,TYPE_BAR
+    UINT8, UINT16, UINT32, FLOAT, TYPE_MENU, TYPE_BAR
 };
 
 typedef struct {
@@ -15,6 +15,8 @@ typedef struct {
     char units [5];
     void *variable;
     char val_str[8];
+    float val_min;
+    float val_max;
 } menu_item;
 
 typedef struct {
@@ -35,7 +37,7 @@ uint8_t get_menu_position(MENU *m);
 menu_item *get_p_to_item(MENU *m);
 void menu_get_item_string(MENU *m, char *str, uint8_t n);
 void menu_whole_string(MENU *m, char *s, STATE state);
-void menu_create_item(menu_item *m, const char * name, enum VAR_TYPE t,const char *units, void *p_variable);
+void menu_create_item(menu_item *item, const char *name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val);
 void menu_increment_item(MENU *m);
 void menu_decrement_item(MENU *m);
 void menu_swap(MENU **dest, MENU *src);
