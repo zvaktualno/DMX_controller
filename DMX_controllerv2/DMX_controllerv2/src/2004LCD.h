@@ -65,7 +65,6 @@ void lcd_rightToLeft(void);
 void lcd_autoscroll(void);
 void lcd_noAutoscroll(void);
 void lcd_createChar(uint8_t location, uint8_t charmap[]);
-uint8_t lcd_getBacklight(void);
 void lcd_command(uint8_t value);
 size_t lcd_write(uint8_t value);
 void lcd_send(uint8_t value, uint8_t mode);
@@ -74,13 +73,6 @@ void lcd_pulseEnable(uint8_t _data);
 void lcd_load_custom_character(uint8_t char_num, uint8_t *rows);
 void lcd_setBacklight(uint8_t new_val);
 void lcd_printstr(char *str);
-uint8_t _addr;
-uint8_t _displayfunction;
-uint8_t _displaycontrol;
-uint8_t _displaymode;
-uint8_t _cols;
-uint8_t _rows;
-uint8_t _charsize;
-uint8_t _backlightval;
+
 
 #endif /* 2004LCD_H_ */

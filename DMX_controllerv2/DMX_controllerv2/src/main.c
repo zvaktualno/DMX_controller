@@ -19,6 +19,10 @@ typedef enum {
 
 MODE device_mode;
 MODE select_device_mode(uint8_t mode);
+void configure_dac(void);
+void configure_dac_channel(void);
+
+struct dac_module dac_instance;
 void IO_init(void);
 
 void NMI_Handler(void) {
@@ -76,6 +80,8 @@ int main (void) {
     uint8_t brightness  = 0, contrast = 0;
     menu_item tmp_item;
 
+    menu_create_item(&tmp_item, "SETTINGS", TYPE_MENU, "", (void *)&settings_menu, 0, 0);
+    menu_add_item(&main_menu, tmp_item);
     menu_create_item(&tmp_item, "CHANNEL 1", TYPE_MENU, "", (void *)&p_to_menus[0], 0, 0);
     menu_add_item(&main_menu, tmp_item);
     menu_create_item(&tmp_item, "CHANNEL 2", TYPE_MENU, "", (void *)&p_to_menus[1], 0, 0);
@@ -86,12 +92,11 @@ int main (void) {
     menu_add_item(&main_menu, tmp_item);
     menu_create_item(&tmp_item, "CHANNEL 5", TYPE_MENU, "", (void *)&p_to_menus[4], 0, 0);
     menu_add_item(&main_menu, tmp_item);
-    menu_create_item(&tmp_item, "SETTINGS", TYPE_MENU, "", (void *)&settings_menu, 0, 0);
-    menu_add_item(&main_menu, tmp_item);
 
-    menu_create_item(&tmp_item, "BRIGHTNES", UINT8, "", (void *)&brightness, 0, 0);
+
+    menu_create_item(&tmp_item, "CONTRAST", UINT8, "", (void *)&contrast, 0, 16);
     menu_add_item(&settings_menu, tmp_item);
-    menu_create_item(&tmp_item, "CONTRAST", UINT8, "", (void *)&contrast, 0, 0);
+    menu_create_item(&tmp_item, "BRIGHTNES", UINT8, "", (void *)&brightness, 0, 10);
     menu_add_item(&settings_menu, tmp_item);
     menu_create_item(&tmp_item, "MODE", UINT8, "", (void *)&device_mode_num, 0, 3);
     menu_add_item(&settings_menu, tmp_item);
@@ -134,11 +139,23 @@ int main (void) {
         menu_create_item(&tmp_item, "BACK", TYPE_MENU, "", (void *)&main_menu, 0, 0);
         menu_add_item(p_to_menus[i], tmp_item);
     }
+    port_pin_set_output_level(PIN_LCD_BL, 1);
+    lcd_begin();
+    configure_dac();
+    configure_dac_channel();
+    //! [setup_init]
 
+    //! [setup_enable]
+    dac_enable(&dac_instance);
     /*
         configure_tcc0();
         configure_tcc0_callbacks(&adsr_channel0, &adsr_channel1, &adsr_channel2, &adsr_channel3, &adsr_channel4);
     */
+
+    uint16_t i = 0;
+    uint8_t prev_contrast = 0;
+    uint8_t prev_brightness = 0;
+
     for(uint16_t i = 0; i < sizeof(dmx_values); i++) {
         dmx_values[i] = 0;
     }
@@ -150,29 +167,68 @@ int main (void) {
 
       device_mode = TRIGGER;
       uint32_t send_data_timer = 0;*/
-    while(1) {
-        delay_ms(1000);
-        increment_menu_position(selected_menu);
+    uint8_t column = 0;
+    uint8_t key_pressed = 0;
+    while (1) {
+        if(contrast != prev_contrast) {
+            prev_contrast = contrast;
+            dac_chan_write(&dac_instance, DAC_CHANNEL_0, (5UL << 6));
+        }
+        if(contrast == 16)contrast = 0;
+
+        if(brightness != prev_brightness) {
+            prev_brightness = brightness;
+        }
+
+        char test[4][21];
+        menu_whole_string(selected_menu, test, SCROLL);
+        for(uint8_t i = 0; i < 4; i++)
+            for(uint8_t j = 0; j < 20; j++) {
+
+                lcd_setCursor(j, i);
+                lcd_write(test[i][j]);
+            }
+
+        key_pressed = 1;
+        switch(get_encoder_status()) {
+            case BACKWARD:
+                if(column)
+                    menu_decrement_item(selected_menu);
+                else
+                    decrement_menu_position(selected_menu);
+                break;
+            case FORWARD:
+                if(column)
+                    if(get_p_to_item(selected_menu)->type == TYPE_MENU)
+                        menu_swap(&selected_menu, (MENU *)get_p_to_item(selected_menu)->variable);
+                    else
+                        menu_increment_item(selected_menu);
+                else
+                    increment_menu_position(selected_menu);
+                break;
+            default:
+                key_pressed = 0;
+                break;
+        }
+        /*
+          while(1) {
+              if(millis() - send_data_timer > 1000) {
+                  send_data_timer = millis();
+                  device_mode = select_device_mode(device_mode_num);
+                  if(device_mode == DMX || device_mode == BOTH) {
+                      BREAKPOINT;
+                      DMX_SendMessage(dmx_values, sizeof(dmx_values));
+                  }
+
+                  if(device_mode == TRIGGER || device_mode == BOTH) {
+                      BREAKPOINT;
+                      uint8_t usb_values[] = {get_ADSR_value(&adsr_channel0), get_ADSR_value(&adsr_channel1), get_ADSR_value(&adsr_channel2), get_ADSR_value(&adsr_channel3), get_ADSR_value(&adsr_channel4)};
+                      USB_SendMessage(usb_values, 5);
+                  }
+              }
+          }*/
     }
-    /*
-      while(1) {
-          if(millis() - send_data_timer > 1000) {
-              send_data_timer = millis();
-              device_mode = select_device_mode(device_mode_num);
-              if(device_mode == DMX || device_mode == BOTH) {
-                  BREAKPOINT;
-                  DMX_SendMessage(dmx_values, sizeof(dmx_values));
-              }
-
-              if(device_mode == TRIGGER || device_mode == BOTH) {
-                  BREAKPOINT;
-                  uint8_t usb_values[] = {get_ADSR_value(&adsr_channel0), get_ADSR_value(&adsr_channel1), get_ADSR_value(&adsr_channel2), get_ADSR_value(&adsr_channel3), get_ADSR_value(&adsr_channel4)};
-                  USB_SendMessage(usb_values, 5);
-              }
-          }
-      }*/
 }
-
 MODE select_device_mode(uint8_t mode) {
     switch(device_mode) {
         case 0:
@@ -243,4 +299,21 @@ void IO_init(void) {
     mux_config.mux_position = MUX_ADC4;
     system_pinmux_pin_set_config(PIN_ADC4, &mux_config);
 
+    mux_config.mux_position = MUX_LCD_VO;
+    system_pinmux_pin_set_config(PIN_LCD_VO, &mux_config);
+}
+void configure_dac(void) {
+    struct dac_config config_dac;
+    dac_get_config_defaults(&config_dac);
+    config_dac.reference = DAC_REFERENCE_AVCC;
+    dac_init(&dac_instance, DAC, &config_dac);
+}
+
+void configure_dac_channel(void) {
+    struct dac_chan_config config_dac_chan;
+    dac_chan_get_config_defaults(&config_dac_chan);
+
+    dac_chan_set_config(&dac_instance, DAC_CHANNEL_0, &config_dac_chan);
+
+    dac_chan_enable(&dac_instance, DAC_CHANNEL_0);
 }

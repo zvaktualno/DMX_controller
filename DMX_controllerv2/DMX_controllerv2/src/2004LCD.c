@@ -2,32 +2,15 @@
 #include <stdint.h>
 #include "config.h"
 #include "2004LCD.h"
-
+uint8_t _displayfunction, _displaycontrol, _displaymode;
 
 void lcd_begin(void) {
-    _displayfunction = LCD_8BITMODE | LCD_1LINE | LCD_5x8DOTS;
 
-    if (_rows > 1) {
-        _displayfunction |= LCD_2LINE;
-    }
+    _displayfunction = LCD_8BITMODE | LCD_5x8DOTS;
 
-    // for some 1 line displays you can select a 10 pixel high font
-    if ((_charsize != 0) && (_rows == 1)) {
-        _displayfunction |= LCD_5x10DOTS;
-    }
-
-    // SEE PAGE 45/46 FOR INITIALIZATION SPECIFICATION!
-    // according to datasheet, we need at least 40ms after power rises above 2.7V
-    // before sending commands. Arduino can turn on way befer 4.5V so we'll wait 50
-    delay_ms(50);
-
-    // Now we pull both RS and R/W low to begin commands
-
-    lcd_write(_backlightval);
-    delay_ms(1000);
 
     // finally, set to 4-bit interface
-    lcd_write8bits(0x02 << 4);
+    //lcd_write8bits(0x02 << 4);
 
     // set # lines, font size, etc.
     lcd_command(LCD_FUNCTIONSET | _displayfunction);
@@ -61,9 +44,6 @@ void lcd_home() {
 
 void lcd_setCursor(uint8_t col, uint8_t row) {
     int row_offsets[] = { 0x00, 0x40, 0x14, 0x54 };
-    if (row > _rows) {
-        row = _rows - 1;  // we count rows starting w/0
-    }
     lcd_command(LCD_SETDDRAMADDR | (col + row_offsets[row]));
 }
 
@@ -72,6 +52,7 @@ void lcd_noDisplay(void) {
     _displaycontrol &= ~LCD_DISPLAYON;
     lcd_command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
+
 void display(void) {
     _displaycontrol |= LCD_DISPLAYON;
     lcd_command(LCD_DISPLAYCONTROL | _displaycontrol);
@@ -82,6 +63,7 @@ void lcd_noCursor(void) {
     _displaycontrol &= ~LCD_CURSORON;
     lcd_command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
+
 void lcd_cursor(void) {
     _displaycontrol |= LCD_CURSORON;
     lcd_command(LCD_DISPLAYCONTROL | _displaycontrol);
@@ -92,6 +74,7 @@ void noBlink(void) {
     _displaycontrol &= ~LCD_BLINKON;
     lcd_command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
+
 void blink(void) {
     _displaycontrol |= LCD_BLINKON;
     lcd_command(LCD_DISPLAYCONTROL | _displaycontrol);
@@ -101,6 +84,7 @@ void blink(void) {
 void lcd_scrollDisplayLeft(void) {
     lcd_command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT);
 }
+
 void lcd_scrollDisplayRight(void) {
     lcd_command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT);
 }
@@ -137,10 +121,6 @@ void lcd_createChar(uint8_t location, uint8_t charmap[]) {
     for (int i = 0; i < 8; i++) {
         lcd_write(charmap[i]);
     }
-}
-
-uint8_t lcd_getBacklight(void) {
-    return _backlightval == LCD_BACKLIGHT;
 }
 
 inline void lcd_command(uint8_t value) {

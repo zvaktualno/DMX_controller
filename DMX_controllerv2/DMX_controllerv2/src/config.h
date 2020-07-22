@@ -51,6 +51,7 @@
 #define PIN_ADC2 PIN_PA06
 #define PIN_ADC3 PIN_PA07
 #define PIN_ADC4 PIN_PA03
+#define PIN_LCD_VO PIN_PA02
 
 /* MUX definitions */
 #define MUX_ADC0 PINMUX_PA04B_ADC0_AIN4
@@ -58,7 +59,7 @@
 #define MUX_ADC2 PINMUX_PA06B_ADC0_AIN6
 #define MUX_ADC3 PINMUX_PA07B_ADC0_AIN7
 #define MUX_ADC4 PINMUX_PA03B_ADC0_AIN1
-
+#define MUX_LCD_VO PINMUX_PA02B_DAC_VOUT
 
 typedef struct {
     uint32_t ch, A, D, S, R;
