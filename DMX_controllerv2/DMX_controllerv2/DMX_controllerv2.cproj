@@ -721,6 +721,12 @@
     <Folder Include="src\config\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\2004LCD.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\2004LCD.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\adsr.c">
       <SubType>compile</SubType>
     </Compile>

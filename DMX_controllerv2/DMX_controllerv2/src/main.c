@@ -9,6 +9,7 @@
 #include "RRW_eeprom.h"
 #include "my_i2c.h"
 #include "my_menu.h"
+#include "2004LCD.h"
 
 typedef enum {
     TRIGGER,
@@ -19,6 +20,7 @@ typedef enum {
 MODE device_mode;
 MODE select_device_mode(uint8_t mode);
 void IO_init(void);
+
 void NMI_Handler(void) {
     BREAKPOINT;
 }
@@ -34,6 +36,7 @@ void PendSV_Handler(void) {
 void SysTick_Handler(void) {
     BREAKPOINT;
 }
+
 MENU main_menu = {.num_of_items = 0};
 MENU channel1_menu = {.num_of_items = 0};
 MENU channel2_menu = {.num_of_items = 0};
@@ -54,8 +57,9 @@ MENU *selected_menu = &main_menu;
 
 int main (void) {
     system_init();
-    uint8_t dmx_values[500];
+    IO_init();
 
+    uint8_t dmx_values[500];
     ADSR adsr_channel0 = {.p_to_var = dmx_values + 0};
     ADSR adsr_channel1 = {.p_to_var = dmx_values + 1};
     ADSR adsr_channel2 = {.p_to_var = dmx_values + 2};
