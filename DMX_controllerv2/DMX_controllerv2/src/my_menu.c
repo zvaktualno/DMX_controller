@@ -6,7 +6,8 @@
 //#include "functions.h"
 
 
-void menu_add_item(MENU *m, menu_item item) {
+void menu_add_item(MENU *m, menu_item item)
+{
     if(m->num_of_items == MENU_MAX_ITEMS)
         return;
     m->items[m->num_of_items] = item;
@@ -15,29 +16,43 @@ void menu_add_item(MENU *m, menu_item item) {
     m->curr_window_pos = 0;
 }
 
-void increment_menu_position(MENU *m) {
+void increment_menu_position(MENU *m)
+{
     if(m->curr_pos < m->num_of_items - 1)
         m->curr_pos++;
     if((m->curr_pos - m->curr_window_pos) == 4)
         m->curr_window_pos++;
 }
 
-void decrement_menu_position(MENU *m) {
+void decrement_menu_position(MENU *m)
+{
     if(m->curr_pos > 0)
         m->curr_pos--;
     if(m->curr_pos < m->curr_window_pos)
         m->curr_window_pos--;
 }
 
-uint8_t get_menu_position(MENU *m) {
+uint8_t get_menu_position(MENU *m)
+{
     return m->curr_pos;
 }
 
-menu_item *get_p_to_item(MENU *m) {
+menu_item *get_p_to_item(MENU *m)
+{
     return &(m->items[m->curr_pos]);
 }
 
-void menu_get_item_string(MENU *m, char *str, uint8_t n) {
+void ftoe(char *s, float val)
+{
+    uint32_t whole = (int) val;
+    float fract = val-whole;
+    uint32_t whole_fract= fract*1000;
+    //ne dela v primeru 4.05
+    sprintf(s, "%3lu.%03lu", whole,whole_fract);
+}
+
+void menu_get_item_string(MENU *m, char *str, uint8_t n)
+{
     if(n >= m->num_of_items)
         return;
     menu_item *tmp = m->items + n;
@@ -55,7 +70,7 @@ void menu_get_item_string(MENU *m, char *str, uint8_t n) {
             sprintf(tmp->val_str, "       ");
             break;
         case FLOAT:
-            //ftoe(tmp->val_str, *(float *)tmp->variable);
+            ftoe(tmp->val_str, *(float *)tmp->variable);
             break;
         default:
             strcpy(tmp->val_str, "ERROR99");
@@ -72,7 +87,8 @@ void menu_get_item_string(MENU *m, char *str, uint8_t n) {
 
 }
 
-void menu_whole_solo_string(MENU *m, char *s) {
+void menu_whole_solo_string(MENU *m, char *s)
+{
     char tmp_string[21];
     menu_item *p_to_item = get_p_to_item(m);
     menu_get_item_string(m, tmp_string, m->curr_pos);
@@ -95,12 +111,12 @@ void menu_whole_solo_string(MENU *m, char *s) {
     memcpy(s + 42 + value_length + 1, p_to_item->units, strlen(p_to_item->units));
 }
 
-void menu_whole_string(MENU *m, char *s, STATE state) {
+void menu_whole_string(MENU *m, char *s, STATE state)
+{
     if(state == EDIT) {
         menu_whole_solo_string(m, s);
     }
     else {
-
         uint8_t j = 0;
         for(uint8_t i = (m->curr_window_pos); i < (4 + m->curr_window_pos) && i < m->num_of_items; i++) {
             menu_get_item_string(m, s + 21 * (j++), i);
@@ -112,18 +128,21 @@ void menu_whole_string(MENU *m, char *s, STATE state) {
 
 }
 
-void menu_create_item(menu_item *item, const char *name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val) {
+void menu_create_item(menu_item *item, const char *name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val)
+{
     strcpy(item->name, "         ");
     strcpy(item->name, name);
     strcpy(item->units, "    ");
     strcpy(item->units, units);
+    strcpy(item->val_str,"       ");
     item->type = typ;
     item->variable = p_variable;
     item->val_max = max_val;
     item->val_min = min_val;
 }
 
-void menu_increment_item(MENU *m) {
+void menu_increment_item(MENU *m)
+{
     switch(m->items[m->curr_pos].type) {
         case UINT8:
             if((*(uint8_t *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
@@ -145,7 +164,8 @@ void menu_increment_item(MENU *m) {
             break;
     }
 }
-void menu_decrement_item(MENU *m) {
+void menu_decrement_item(MENU *m)
+{
     switch(m->items[m->curr_pos].type) {
         case UINT8:
             if((*(uint8_t *)m->items[m->curr_pos].variable) > (m->items[m->curr_pos].val_min))
@@ -167,6 +187,7 @@ void menu_decrement_item(MENU *m) {
             break;
     }
 }
-void menu_swap(MENU **dest, MENU *src) {
+void menu_swap(MENU **dest, MENU *src)
+{
     *dest = src;
 }

@@ -40,20 +40,12 @@
 #define LCD_5x10DOTS 0x04
 #define LCD_5x8DOTS 0x00
 
-// flags for backlight control
-#define LCD_BACKLIGHT 0x08
-#define LCD_NOBACKLIGHT 0x00
-
-#define En (1<<2)
-#define Rw (1<<1)
-#define Rs (1<<0)
-
 void lcd_begin(void);
 void lcd_clear(void);
 void lcd_home(void);
 void lcd_setCursor(uint8_t col, uint8_t row);
 void lcd_noDisplay(void);
-void display(void);
+void lcd_display(void);
 void lcd_noCursor(void);
 void lcd_cursor(void);
 void noBlink(void);
@@ -66,13 +58,12 @@ void lcd_autoscroll(void);
 void lcd_noAutoscroll(void);
 void lcd_createChar(uint8_t location, uint8_t charmap[]);
 void lcd_command(uint8_t value);
-size_t lcd_write(uint8_t value);
+void lcd_write(uint8_t value);
 void lcd_send(uint8_t value, uint8_t mode);
 void lcd_write8bits(uint8_t value);
-void lcd_pulseEnable(uint8_t _data);
+void lcd_pulseEnable(void);
 void lcd_load_custom_character(uint8_t char_num, uint8_t *rows);
-void lcd_setBacklight(uint8_t new_val);
 void lcd_printstr(char *str);
 
 
-#endif /* 2004LCD_H_ */
+#endif

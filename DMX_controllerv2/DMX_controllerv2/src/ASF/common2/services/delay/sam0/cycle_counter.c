@@ -36,30 +36,21 @@
 
 #include "delay.h"
 
-/**
- * \brief Initialize the delay driver.
- *
- * Not used in cycle mode.
- */
-void delay_init(void)
-{
-}
-
 // Delay loop is put to SRAM so that FWS will not affect delay time
 OPTIMIZE_HIGH
 RAMFUNC
 void portable_delay_cycles(unsigned long n)
 {
-	UNUSED(n);
+    UNUSED(n);
 
-	__asm (
-		"loop: DMB	\n"
+    __asm (
+        "loop: DMB	\n"
 #ifdef __ICCARM__
-		"SUBS r0, r0, #1 \n"
+        "SUBS r0, r0, #1 \n"
 #else
-		"SUB r0, r0, #1 \n"
+        "SUB r0, r0, #1 \n"
 #endif
-		"CMP r0, #0  \n"
-		"BNE loop         "
-	);
+        "CMP r0, #0  \n"
+        "BNE loop         "
+    );
 }

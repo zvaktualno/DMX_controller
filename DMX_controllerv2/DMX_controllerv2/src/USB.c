@@ -16,7 +16,7 @@ void configure_USB(void) {
 
     usart_get_config_defaults(&config_usart);
 
-    config_usart.baudrate    =					9600;
+    config_usart.baudrate    =					250000;
     config_usart.transfer_mode =				USART_TRANSFER_ASYNCHRONOUSLY;
     config_usart.mux_setting =					USART_RX_1_TX_0_XCK_1;
     config_usart.character_size =				USART_CHARACTER_SIZE_8BIT;
@@ -37,6 +37,7 @@ void configure_USB(void) {
     usart_enable_transceiver(&USB_instance, USART_TRANSCEIVER_RX);
     delay_ms(1);
     configure_USB_callbacks();
+    USB_transmit_enable();
 }
 
 

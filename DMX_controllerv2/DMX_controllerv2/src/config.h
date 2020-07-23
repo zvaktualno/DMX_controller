@@ -41,11 +41,16 @@
 #define PIN_LCD_D6 PIN_PB00
 #define PIN_LCD_D7 PIN_PB31
 #define PIN_LCD_EN PIN_PB07
-#define PIN_LCD_RW PIN_PB09
-#define PIN_LCD_RS PIN_PB08
+#define PIN_LCD_RW PIN_PB08
+#define PIN_LCD_RS PIN_PB09
 #define PIN_LCD_BL PIN_PB11
+
 #define PIN_SW1 PIN_PA12
+#define PIN_SW1_EIC_LINE 12
+
 #define PIN_SW2 PIN_PA13
+#define PIN_SW2_EIC_LINE 13
+
 #define PIN_ADC0 PIN_PA04
 #define PIN_ADC1 PIN_PA05
 #define PIN_ADC2 PIN_PA06
@@ -76,5 +81,10 @@ typedef struct {
     channel ch;
 } PRESET;
 
+typedef enum {
+    BUTTON_NONE,
+    BUTTON_1,
+    BUTTON_2,
+} TIPKA;
 
 #endif
