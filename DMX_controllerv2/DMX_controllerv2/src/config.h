@@ -3,20 +3,16 @@
 #define CONFIG_H_
 #include "adsr.h"
 
-#define ADC0_RESOLUTION ADC_RESOLUTION_8BIT
-
 #define BREAKPOINT asm("nop")
 
 #define TWI_BUFFER_SIZE 64
 
-#define USB_TX_PINMUX 255
-#define USB_RX_PINMUX 255
 #define USB_MODULE SERCOM1
 
 /* DMX UART definitions */
-#define DMX_TX_PINMUX 255
-#define DMX_RX_PINMUX 255
+
 #define DMX_MODULE SERCOM5
+#define DMX_IRQn SERCOM5_IRQn
 #define MAX_DMX_CHANNELS 256
 
 /* I2C definitions */
@@ -44,9 +40,11 @@
 #define PIN_LCD_RW PIN_PB08
 #define PIN_LCD_RS PIN_PB09
 #define PIN_LCD_BL PIN_PB11
-
+#define PIN_DMX_DIR PIN_PA20
 #define PIN_SW1 PIN_PA12
 #define PIN_SW1_EIC_LINE 12
+#define TX_PIN PIN_PB16
+
 
 #define PIN_SW2 PIN_PA13
 #define PIN_SW2_EIC_LINE 13
@@ -66,25 +64,37 @@
 #define MUX_ADC4 PINMUX_PA03B_ADC0_AIN1
 #define MUX_LCD_VO PINMUX_PA02B_DAC_VOUT
 
-typedef struct {
-    uint32_t ch, A, D, S, R;
+typedef struct
+{
+    uint32_t ch;
+    ADSR *adsr;
     float level;
 } channel;
-typedef enum {
+typedef enum
+{
     SCROLL,
     EDIT,
 } STATE ;
-typedef struct {
+typedef struct
+{
     char preset_name[10];
     uint16_t position;
     uint8_t channels[512];
     channel ch;
 } PRESET;
 
-typedef enum {
+typedef enum
+{
     BUTTON_NONE,
     BUTTON_1,
     BUTTON_2,
 } TIPKA;
 
+typedef struct
+{
+    uint8_t contrast;
+    uint8_t brightness;
+    uint8_t fixture_size;
+    STATE mode;
+} SETTINGS;
 #endif

@@ -10,7 +10,8 @@
 #define _ADSR_H_
 
 
-typedef enum {
+typedef enum
+{
     START,
     ATTACK,
     DECAY,
@@ -19,7 +20,8 @@ typedef enum {
     END
 } ADSR_STATE;
 
-typedef struct {
+typedef struct
+{
     uint8_t *p_to_var;
     uint32_t value;				//32-bit output value
     uint32_t interval;			//process()'s period of calling
@@ -35,7 +37,10 @@ typedef struct {
     ADSR_STATE state;			//state of the ADSR(A, D, S, R)
 } ADSR;
 
-void process_ADSR(ADSR *adsr);
-uint8_t get_ADSR_value(ADSR *adsr);
+
+void adsr_process(ADSR *adsr);
+uint8_t adsr_get_value(ADSR *adsr);
+void adsr_trigger(ADSR *adsr);
+void adsr_init(ADSR *adsr, uint32_t interval);
 
 #endif /* ADSR_H_ */

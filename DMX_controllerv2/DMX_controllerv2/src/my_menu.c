@@ -79,10 +79,10 @@ void menu_get_item_string(MENU *m, char *str, uint8_t n)
     *(tmp->val_str + 7) = 0;
     char test[21];
     if(n == m->curr_pos) {
-        sprintf(test, "%c%s%s%s", '~', tmp->name, tmp->val_str + 1, tmp->units);
+        sprintf(test, "%c%-9s%6s%4s", '~', tmp->name, tmp->val_str, tmp->units);
     }
     else
-        sprintf(test, "%s%s%s", tmp->name, tmp->val_str, tmp->units);
+        sprintf(test, "%-9s%7s%4s", tmp->name, tmp->val_str, tmp->units);
     memcpy(str, test, 20);
 
 }
@@ -154,7 +154,7 @@ void menu_increment_item(MENU *m)
             break;
         case UINT32:
             if((*(uint32_t *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
-                (*(uint32_t *)m->items[m->curr_pos].variable)++;
+                (*(uint32_t *)m->items[m->curr_pos].variable)+=10;
             break;
         case FLOAT:
             if((*(float *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
@@ -177,11 +177,13 @@ void menu_decrement_item(MENU *m)
             break;
         case UINT32:
             if((*(uint32_t *)m->items[m->curr_pos].variable) > (m->items[m->curr_pos].val_min))
-                (*(uint32_t *)m->items[m->curr_pos].variable)--;
+                (*(uint32_t *)m->items[m->curr_pos].variable)-=10;
             break;
         case FLOAT:
             if((*(float *)m->items[m->curr_pos].variable) > (m->items[m->curr_pos].val_min))
                 (*(float *)m->items[m->curr_pos].variable) -= 0.1;
+            if(*(float *)m->items[m->curr_pos].variable < 0)
+                *(float *)m->items[m->curr_pos].variable=0;
             break;
         default:
             break;

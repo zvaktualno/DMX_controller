@@ -8,6 +8,10 @@ src\adsr.c
 
 src\ASF\common2\services\delay\sam0\cycle_counter.c
 
+src\ASF\sam0\drivers\tc\tc_interrupt.c
+
+src\ASF\sam0\drivers\tc\tc_sam_l_c\tc.c
+
 src\tipke.c
 
 src\ASF\common2\services\delay\sam0\systick_counter.c

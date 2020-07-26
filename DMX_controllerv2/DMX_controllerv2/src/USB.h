@@ -21,6 +21,6 @@ uint8_t USB_recieve_ready(void);
 uint8_t *USB_get_tx_buf(void);
 unsigned char *USB_get_rx_buf(void);
 void configure_USB_callbacks(void);
-void USB_change_baudrate(uint16_t baud);
+void USB_change_baudrate(uint32_t baud);
 
 #endif

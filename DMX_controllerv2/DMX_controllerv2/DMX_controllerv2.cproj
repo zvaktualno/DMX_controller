@@ -36,6 +36,7 @@
     <option id="sam0.drivers.ac" value="Add" config="callback" content-id="Atmel.ASF" />
     <option id="sam0.drivers.adc" value="Add" config="callback" content-id="Atmel.ASF" />
     <option id="sam0.drivers.dac" value="Add" config="callback" content-id="Atmel.ASF" />
+    <option id="sam0.drivers.extint" value="Add" config="callback" content-id="Atmel.ASF" />
     <option id="sam0.drivers.port" value="Add" config="" content-id="Atmel.ASF" />
     <option id="sam0.drivers.sercom.i2c.master" value="Add" config="callback" content-id="Atmel.ASF" />
     <option id="sam0.drivers.sercom.usart" value="Add" config="callback" content-id="Atmel.ASF" />
@@ -43,7 +44,7 @@
     <option id="sam0.drivers.tcc" value="Add" config="callback" content-id="Atmel.ASF" />
     <option id="sam0.services.rww_eeprom_emulator" value="Add" config="" content-id="Atmel.ASF" />
     <option id="sam0.utils.stdio.stdio_serial" value="Add" config="" content-id="Atmel.ASF" />
-    <option id="sam0.drivers.extint" value="Add" config="callback" content-id="Atmel.ASF" />
+    <option id="sam0.drivers.tc" value="Add" config="callback" content-id="Atmel.ASF" />
     <option id="sam0.utils.linker_scripts" value="Add" config="" content-id="Atmel.ASF" />
   </options>
   <configurations />
@@ -271,6 +272,10 @@
     <file path="src/ASF/sam0/drivers/extint/extint.h" framework="" version="3.46.0" source="sam0\drivers\extint\extint.h" changed="False" content-id="Atmel.ASF" />
     <file path="src/Config/conf_extint.h" framework="" version="3.46.0" source="sam0\drivers\extint\module_config\conf_extint.h" changed="False" content-id="Atmel.ASF" />
     <file path="src/ASF/sam0/drivers/extint/extint_sam_l_c/extint.c" framework="" version="3.46.0" source="sam0\drivers\extint\extint_sam_l_c\extint.c" changed="False" content-id="Atmel.ASF" />
+    <file path="src/ASF/sam0/drivers/tc/tc_interrupt.c" framework="" version="3.46.0" source="sam0\drivers\tc\tc_interrupt.c" changed="False" content-id="Atmel.ASF" />
+    <file path="src/ASF/sam0/drivers/tc/tc_interrupt.h" framework="" version="3.46.0" source="sam0\drivers\tc\tc_interrupt.h" changed="False" content-id="Atmel.ASF" />
+    <file path="src/ASF/sam0/drivers/tc/tc.h" framework="" version="3.46.0" source="sam0\drivers\tc\tc.h" changed="False" content-id="Atmel.ASF" />
+    <file path="src/ASF/sam0/drivers/tc/tc_sam_l_c/tc.c" framework="" version="3.46.0" source="sam0\drivers\tc\tc_sam_l_c\tc.c" changed="False" content-id="Atmel.ASF" />
   </files>
   <documentation help="http://asf.atmel.com/docs/3.46.0/common.applications.user_application.sam0_system.user_board.atsamc21j18a/html/index.html" />
   <offline-documentation help="" />
@@ -319,6 +324,7 @@
       <Value>I2C_MASTER_CALLBACK_MODE=true</Value>
       <Value>CYCLE_MODE</Value>
       <Value>EXTINT_CALLBACK_MODE=true</Value>
+      <Value>TC_ASYNC=true</Value>
     </ListValues>
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
@@ -365,6 +371,8 @@
       <Value>../src/ASF/sam0/services/eeprom/emulator/rwwee_array</Value>
       <Value>../src/ASF/sam0/drivers/extint</Value>
       <Value>../src/ASF/sam0/drivers/extint/extint_sam_l_c</Value>
+      <Value>../src/ASF/sam0/drivers/tc</Value>
+      <Value>../src/ASF/sam0/drivers/tc/tc_sam_l_c</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize for size (-Os)</armgcc.compiler.optimization.level>
@@ -430,9 +438,11 @@
       <Value>../src/ASF/sam0/services/eeprom/emulator/rwwee_array</Value>
       <Value>../src/ASF/sam0/drivers/extint</Value>
       <Value>../src/ASF/sam0/drivers/extint/extint_sam_l_c</Value>
+      <Value>../src/ASF/sam0/drivers/tc</Value>
+      <Value>../src/ASF/sam0/drivers/tc/tc_sam_l_c</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
-  <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=USER_BOARD -DAC_CALLBACK_MODE=true -DUSART_CALLBACK_MODE=true -DTCC_ASYNC=true -DADC_CALLBACK_MODE=true -DI2C_MASTER_CALLBACK_MODE=true -DCYCLE_MODE -DEXTINT_CALLBACK_MODE=true</armgcc.preprocessingassembler.general.AssemblerFlags>
+  <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=USER_BOARD -DAC_CALLBACK_MODE=true -DUSART_CALLBACK_MODE=true -DTCC_ASYNC=true -DADC_CALLBACK_MODE=true -DI2C_MASTER_CALLBACK_MODE=true -DCYCLE_MODE -DEXTINT_CALLBACK_MODE=true -DTC_ASYNC=true</armgcc.preprocessingassembler.general.AssemblerFlags>
   <armgcc.preprocessingassembler.general.IncludePaths>
     <ListValues>
       <Value>../src/ASF/common/boards</Value>
@@ -477,6 +487,8 @@
       <Value>../src/ASF/sam0/services/eeprom/emulator/rwwee_array</Value>
       <Value>../src/ASF/sam0/drivers/extint</Value>
       <Value>../src/ASF/sam0/drivers/extint/extint_sam_l_c</Value>
+      <Value>../src/ASF/sam0/drivers/tc</Value>
+      <Value>../src/ASF/sam0/drivers/tc/tc_sam_l_c</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
 </ArmGcc>
@@ -503,6 +515,7 @@
       <Value>I2C_MASTER_CALLBACK_MODE=true</Value>
       <Value>CYCLE_MODE</Value>
       <Value>EXTINT_CALLBACK_MODE=true</Value>
+      <Value>TC_ASYNC=true</Value>
     </ListValues>
   </armgcc.compiler.symbols.DefSymbols>
   <armgcc.compiler.directories.IncludePaths>
@@ -549,6 +562,8 @@
       <Value>../src/ASF/sam0/services/eeprom/emulator/rwwee_array</Value>
       <Value>../src/ASF/sam0/drivers/extint</Value>
       <Value>../src/ASF/sam0/drivers/extint/extint_sam_l_c</Value>
+      <Value>../src/ASF/sam0/drivers/tc</Value>
+      <Value>../src/ASF/sam0/drivers/tc/tc_sam_l_c</Value>
     </ListValues>
   </armgcc.compiler.directories.IncludePaths>
   <armgcc.compiler.optimization.level>Optimize (-O1)</armgcc.compiler.optimization.level>
@@ -615,10 +630,12 @@
       <Value>../src/ASF/sam0/services/eeprom/emulator/rwwee_array</Value>
       <Value>../src/ASF/sam0/drivers/extint</Value>
       <Value>../src/ASF/sam0/drivers/extint/extint_sam_l_c</Value>
+      <Value>../src/ASF/sam0/drivers/tc</Value>
+      <Value>../src/ASF/sam0/drivers/tc/tc_sam_l_c</Value>
     </ListValues>
   </armgcc.assembler.general.IncludePaths>
   <armgcc.assembler.debugging.DebugLevel>Default (-g)</armgcc.assembler.debugging.DebugLevel>
-  <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=USER_BOARD -DAC_CALLBACK_MODE=true -DUSART_CALLBACK_MODE=true -DTCC_ASYNC=true -DADC_CALLBACK_MODE=true -DI2C_MASTER_CALLBACK_MODE=true -DCYCLE_MODE -DEXTINT_CALLBACK_MODE=true</armgcc.preprocessingassembler.general.AssemblerFlags>
+  <armgcc.preprocessingassembler.general.AssemblerFlags>-DARM_MATH_CM0PLUS=true -DBOARD=USER_BOARD -DAC_CALLBACK_MODE=true -DUSART_CALLBACK_MODE=true -DTCC_ASYNC=true -DADC_CALLBACK_MODE=true -DI2C_MASTER_CALLBACK_MODE=true -DCYCLE_MODE -DEXTINT_CALLBACK_MODE=true -DTC_ASYNC=true</armgcc.preprocessingassembler.general.AssemblerFlags>
   <armgcc.preprocessingassembler.general.IncludePaths>
     <ListValues>
       <Value>../src/ASF/common/boards</Value>
@@ -663,6 +680,8 @@
       <Value>../src/ASF/sam0/services/eeprom/emulator/rwwee_array</Value>
       <Value>../src/ASF/sam0/drivers/extint</Value>
       <Value>../src/ASF/sam0/drivers/extint/extint_sam_l_c</Value>
+      <Value>../src/ASF/sam0/drivers/tc</Value>
+      <Value>../src/ASF/sam0/drivers/tc/tc_sam_l_c</Value>
     </ListValues>
   </armgcc.preprocessingassembler.general.IncludePaths>
   <armgcc.preprocessingassembler.debugging.DebugLevel>Default (-Wa,-g)</armgcc.preprocessingassembler.debugging.DebugLevel>
@@ -729,6 +748,8 @@
     <Folder Include="src\ASF\sam0\drivers\tcc\quick_start_faultn\" />
     <Folder Include="src\ASF\sam0\drivers\tcc\quick_start_faultx\" />
     <Folder Include="src\ASF\sam0\drivers\tcc\quick_start_timer\" />
+    <Folder Include="src\ASF\sam0\drivers\tc\" />
+    <Folder Include="src\ASF\sam0\drivers\tc\tc_sam_l_c\" />
     <Folder Include="src\ASF\sam0\services\" />
     <Folder Include="src\ASF\sam0\services\eeprom\" />
     <Folder Include="src\ASF\sam0\services\eeprom\emulator\" />
@@ -774,6 +795,18 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\ASF\common2\services\delay\sam0\cycle_counter.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\ASF\sam0\drivers\tc\tc.h">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\ASF\sam0\drivers\tc\tc_interrupt.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <None Include="src\ASF\sam0\drivers\tc\tc_interrupt.h">
+      <SubType>compile</SubType>
+    </None>
+    <Compile Include="src\ASF\sam0\drivers\tc\tc_sam_l_c\tc.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\tipke.c">

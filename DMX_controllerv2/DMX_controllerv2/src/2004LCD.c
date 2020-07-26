@@ -12,7 +12,6 @@ void lcd_begin(void)
 
     _displayfunction = LCD_2LINE| LCD_8BITMODE | LCD_5x8DOTS;
     delay_ms(50);
-    port_pin_set_output_level(PIN_LCD_BL, 1);
     port_pin_set_output_level(PIN_LCD_RS,0);
     port_pin_set_output_level(PIN_LCD_RW,0);
     port_pin_set_output_level(PIN_LCD_EN,0);

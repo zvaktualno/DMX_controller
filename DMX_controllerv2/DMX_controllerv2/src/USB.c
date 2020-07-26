@@ -10,7 +10,8 @@ volatile uint8_t USB_flags;
 struct usart_module USB_instance;
 volatile uint16_t c;
 
-void configure_USB(void) {
+void configure_USB(void)
+{
 
     struct usart_config config_usart;
 
@@ -41,49 +42,60 @@ void configure_USB(void) {
 }
 
 
-void USB_SendMessage (uint8_t *p_string, uint16_t length) {
+void USB_SendMessage (uint8_t *p_string, uint16_t length)
+{
     while(!USB_transmit_ready());
     USB_transmit_disable();
     while(usart_write_buffer_job(&USB_instance, p_string, length) != STATUS_OK);
     while(usart_get_job_status(&USB_instance, USART_TRANSCEIVER_TX) != STATUS_OK);
 }
 
-void USB_transmit_callback(struct usart_module *const usart_module) {
+void USB_transmit_callback(struct usart_module *const usart_module)
+{
     USB_transmit_enable();
 }
 
-void USB_recieve_enable(void) {
+void USB_recieve_enable(void)
+{
     USB_flags |= (1 << USB_RXR);
 }
 
-void USB_recieve_disable(void) {
+void USB_recieve_disable(void)
+{
     USB_flags &= ~(1 << USB_RXR);
 }
 
-void USB_transmit_enable(void) {
+void USB_transmit_enable(void)
+{
     USB_flags |= (1 << USB_TXR);
 }
 
-void USB_transmit_disable(void) {
+void USB_transmit_disable(void)
+{
     USB_flags &= ~(1 << USB_TXR);
 }
-uint8_t USB_transmit_ready(void) {
+uint8_t USB_transmit_ready(void)
+{
     return USB_flags & (1 << USB_TXR);
 }
 
-uint8_t USB_recieve_ready(void) {
+uint8_t USB_recieve_ready(void)
+{
     return USB_flags & (1 << USB_RXR);
 }
 
-uint8_t *USB_get_tx_buf(void) {
+uint8_t *USB_get_tx_buf(void)
+{
     return USB_TxBuf;
 }
 
-unsigned char *USB_get_rx_buf(void) {
+unsigned char *USB_get_rx_buf(void)
+{
     return USB_RxBuf;
 }
 
-void configure_USB_callbacks(void) {
+void configure_USB_callbacks(void)
+{
     usart_register_callback(&USB_instance, USB_transmit_callback, USART_CALLBACK_BUFFER_TRANSMITTED);
     //usart_register_callback(&USB_instance, usart_read_callback, USART_CALLBACK_BUFFER_RECEIVED);
 
@@ -97,7 +109,8 @@ void usart_read_callback(struct usart_module *const usart_module) {
     usart_read_job(&USB_instance, &c);
 }*/
 
-void USB_change_baudrate(uint16_t baud) {
+void USB_change_baudrate(uint32_t baud)
+{
     while(!USB_transmit_ready());
     USB_transmit_disable();
     float part = 1 - 16.0 * baud / 4000000;

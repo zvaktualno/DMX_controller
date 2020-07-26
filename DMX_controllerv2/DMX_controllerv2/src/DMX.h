@@ -23,6 +23,6 @@ uint8_t *DMX_get_tx_buf(void);
 unsigned char *DMX_get_rx_buf(void);
 void configure_DMX_callbacks(void);
 void usart_read_callback(struct usart_module *const usart_module);
-void DMX_change_baudrate(uint16_t baud);
+void DMX_change_baudrate(uint32_t baud);
 
 #endif
