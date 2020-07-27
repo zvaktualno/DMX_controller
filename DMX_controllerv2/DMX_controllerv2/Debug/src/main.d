@@ -176,7 +176,8 @@ src/main.d src/main.o: ../src/main.c ../src/asf.h \
  ../src/ASF/sam0/drivers/tcc/tcc_callback.h \
  ../src/ASF/sam0/drivers/tcc/tcc.h ../src/config.h ../src/adsr.h \
  ../src/timers.h ../src/my_adc.h ../src/USB.h ../src/DMX.h \
- ../src/my_menu.h ../src/2004LCD.h ../src/tipke.h
+ ../src/my_i2c.h ../src/my_menu.h ../src/2004LCD.h ../src/tipke.h \
+ ../src/i2c_fs.h
 
 ../src/asf.h:
 
@@ -556,8 +557,12 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 
 ../src/DMX.h:
 
+../src/my_i2c.h:
+
 ../src/my_menu.h:
 
 ../src/2004LCD.h:
 
 ../src/tipke.h:
+
+../src/i2c_fs.h:

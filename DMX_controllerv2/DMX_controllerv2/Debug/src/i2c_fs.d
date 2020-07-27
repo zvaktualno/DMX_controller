@@ -174,8 +174,8 @@ src/i2c_fs.d src/i2c_fs.o: ../src/i2c_fs.c ../src/asf.h \
  ../src/ASF/sam0/drivers/tc/tc_interrupt.h \
  ../src/ASF/sam0/drivers/tc/tc.h ../src/ASF/sam0/drivers/tcc/tcc.h \
  ../src/ASF/sam0/drivers/tcc/tcc_callback.h \
- ../src/ASF/sam0/drivers/tcc/tcc.h ../src/i2c_fs.h ../src/my_i2c.h \
- ../src/config.h ../src/adsr.h
+ ../src/ASF/sam0/drivers/tcc/tcc.h ../src/config.h ../src/adsr.h \
+ ../src/my_i2c.h ../src/i2c_fs.h
 
 ../src/asf.h:
 
@@ -543,10 +543,10 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 
 ../src/ASF/sam0/drivers/tcc/tcc.h:
 
-../src/i2c_fs.h:
-
-../src/my_i2c.h:
-
 ../src/config.h:
 
 ../src/adsr.h:
+
+../src/my_i2c.h:
+
+../src/i2c_fs.h:

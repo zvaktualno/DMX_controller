@@ -178,7 +178,7 @@ src/my_i2c.d src/my_i2c.o: ../src/my_i2c.c ../src/asf.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\string.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\xlocale.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\sys\string.h \
- ../src/config.h ../src/adsr.h ../src/my_i2c.h
+ ../src/my_i2c.h ../src/config.h ../src/adsr.h
 
 ../src/asf.h:
 
@@ -552,8 +552,8 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-none-eabi\include\sys\string.h:
 
+../src/my_i2c.h:
+
 ../src/config.h:
 
 ../src/adsr.h:
-
-../src/my_i2c.h:

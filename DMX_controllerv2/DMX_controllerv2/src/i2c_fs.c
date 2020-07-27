@@ -1,11 +1,13 @@
 #include <asf.h>
 #include <stdint.h>
-#include "i2c_fs.h"
-#include "my_i2c.h"
 #include "config.h"
+#include "my_i2c.h"
+#include "i2c_fs.h"
+
+
 I2C_FS fs;
 /* Gets all saves. */
-void preset_init(void)
+void memory_init(void)
 {
     read_memory_map();
     get_num_of_saves();
@@ -45,8 +47,7 @@ static uint16_t preset_get_mem_pos(uint8_t position)
 static void get_num_of_saves(void)
 {
     uint8_t stevec = 0;
-    for (uint8_t i = 0; i < MAX_SAVES; i++)
-    {
+    for (uint8_t i = 0; i < MAX_SAVES; i++) {
         if (fs.memory_map & (1UL << i))
             stevec++;
     }
@@ -81,11 +82,10 @@ void memory_full_format(void)
     uint8_t null_array[66];
     for (uint8_t i = 0; i < 66; i++)
         null_array[i] = 0;
-    for (uint16_t i = 0; i < MEMORY_SIZE; i += 64)
-    {
+    for (uint16_t i = 0; i < MEMORY_SIZE; i += 64) {
         null_array[0] = (i >> 8) & 0xFF;
         null_array[1] = i & 0xFF;
-        TWI_write(EEPROM_ADDR, 64, null_array);
+        TWI_write(EEPROM_ADDR, 66, null_array);
         delay_ms(5);
     }
 }
@@ -104,15 +104,12 @@ void write_memory(PRESET *preset, uint8_t position)
     write_memory_map();
 
     uint32_t *p_to_preset = (uint32_t *)preset;
-    while (remaining_size > 0)
-    {
+    while (remaining_size > 0) {
         send_packet[0] = (preset->position + sizeof(PRESET) - remaining_size) >> 8;
         send_packet[1] = (preset->position + sizeof(PRESET) - remaining_size) & 0xFF;
 
-        if (remaining_size > 64)
-        {
-            for (uint16_t i = 2; i < 66; i += 4)
-            {
+        if (remaining_size > 64) {
+            for (uint16_t i = 2; i < 66; i += 4) {
                 for (uint8_t j = 0; j < 4; j++)
                     *(send_packet + i + j) = ((*p_to_preset >> j * 8) & 0xFF);
                 p_to_preset++;
@@ -120,10 +117,9 @@ void write_memory(PRESET *preset, uint8_t position)
             remaining_size -= 64;
             TWI_write(EEPROM_ADDR, send_packet, 66);
         }
-        else
-        { //possible index out of range bug
-            for (uint16_t i = 2; i < remaining_size; i++)
-            {
+        else {
+            //possible index out of range bug
+            for (uint16_t i = 2; i < remaining_size; i++) {
                 for (uint8_t j = 0; j < 4; j++)
                     *(send_packet + i + j) = ((*p_to_preset >> j * 8) & 0xFF);
                 p_to_preset++;

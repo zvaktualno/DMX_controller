@@ -7,10 +7,11 @@
 #include "my_adc.h"
 #include "USB.h"
 #include "DMX.h"
-//#include "my_i2c.h"
+#include "my_i2c.h"
 #include "my_menu.h"
 #include "2004LCD.h"
 #include "tipke.h"
+#include "i2c_fs.h"
 
 typedef enum
 {
@@ -73,9 +74,10 @@ channel trigger_channel3;
 channel trigger_channel4;
 
 STATE state = SCROLL;
-SETTINGS device_settings = {.contrast = 8};
+SETTINGS device_settings = {.contrast = 8, .brightness=16};
 MENU *selected_menu = &main_menu;
 uint8_t key_pressed = 1;
+PRESET preset1;
 int main(void)
 {
     adsr_init(&adsr_channel0, 1);
@@ -83,6 +85,7 @@ int main(void)
     adsr_init(&adsr_channel2, 1);
     adsr_init(&adsr_channel3, 1);
     adsr_init(&adsr_channel4, 1);
+
 
     adsr_channel0.attack = 1000;
     adsr_channel0.decay = 1000;
@@ -97,6 +100,8 @@ int main(void)
     trigger_channel4.adsr = &adsr_channel4;
     system_init();
     delay_init();
+    configure_i2c();
+
     IO_init();
     lcd_begin();
     delay_ms(199);
@@ -108,15 +113,18 @@ int main(void)
     configure_tc0();
     dac_enable(&dac_instance);
 
-    for (uint16_t i = 0; i < sizeof(dmx_values); i++)
-    {
+    for (uint16_t i = 0; i < sizeof(dmx_values); i++) {
         dmx_values[i] = 0;
     }
 
-    Enable_global_interrupt();
+
+    NVIC_SetPriority(SERCOM3_IRQn,3);
     NVIC_SetPriority(ADC0_IRQn, 1);
     NVIC_SetPriority(DMX_IRQn, 2);
-
+    Enable_global_interrupt();
+    delay_ms(100);
+    memory_full_format();
+    memory_init();
     configure_adc0(&adsr_channel0, &adsr_channel1, &adsr_channel2, &adsr_channel3, &adsr_channel4);
     adc0_set_compare_value(100);
     configure_tcc0();
@@ -124,8 +132,7 @@ int main(void)
 
     uint8_t device_mode_num = 0;
     MENU *p_to_dmx_group_menus[16];
-    for (uint8_t i = 0; i < 16; i++)
-    {
+    for (uint8_t i = 0; i < 16; i++) {
         p_to_dmx_group_menus[i] = (MENU *)malloc(sizeof(MENU));
     }
     channel *p_to_channels[5] = {&trigger_channel0, &trigger_channel1, &trigger_channel2, &trigger_channel3, &trigger_channel4};
@@ -147,23 +154,21 @@ int main(void)
     menu_create_item(&tmp_item, "CHANNEL 5", TYPE_MENU, "", (void *)p_to_menus[4], 0, 0);
     menu_add_item(&main_menu, tmp_item);
 
-    menu_create_item(&tmp_item, "CONTRAST", UINT8, "", (void *)&device_settings.contrast, 0, 16);
+    menu_create_item(&tmp_item, "CONTRAST", TYPE_UINT8, "", (void *)&device_settings.contrast, 0, 16);
     menu_add_item(&settings_menu, tmp_item);
-    menu_create_item(&tmp_item, "BRIGHTNES", UINT8, "", (void *)&device_settings.brightness, 0, 16);
+    menu_create_item(&tmp_item, "BRIGHTNES", TYPE_UINT8, "", (void *)&device_settings.brightness, 0, 16);
     menu_add_item(&settings_menu, tmp_item);
-    menu_create_item(&tmp_item, "MODE", UINT8, "", (void *)&device_settings.mode, 0, 2);
+    menu_create_item(&tmp_item, "MODE", TYPE_UINT8, "", (void *)&device_settings.mode, 0, 2);
     menu_add_item(&settings_menu, tmp_item);
-    menu_create_item(&tmp_item, "FIX_SIZE", UINT8, "", (void *)&device_settings.fixture_size, 7, 8);
+    menu_create_item(&tmp_item, "FIX_SIZE", TYPE_UINT8, "", (void *)&device_settings.fixture_size, 7, 8);
     menu_add_item(&settings_menu, tmp_item);
     menu_create_item(&tmp_item, "BACK", TYPE_MENU, "", (void *)&main_menu, 0, 0);
     menu_add_item(&settings_menu, tmp_item);
 
-    for (uint16_t i = 0; i < (MAX_DMX_CHANNELS / 16); i++)
-    {
+    for (uint16_t i = 0; i < (MAX_DMX_CHANNELS / 16); i++) {
         char menu_item_name[10];
 
-        for (uint16_t j = 0; j < MENU_MAX_ITEMS - 1; j++)
-        {
+        for (uint16_t j = 0; j < MENU_MAX_ITEMS - 1; j++) {
             sprintf(menu_item_name, "DMX%d", i * MENU_MAX_ITEMS + j);
             menu_create_item(&tmp_item, menu_item_name, TYPE_UINT8, "", dmx_values + i * 16 + j, -1, 256);
             menu_add_item(p_to_dmx_group_menus[i], tmp_item);
@@ -181,21 +186,20 @@ int main(void)
     menu_create_item(&tmp_item, "BACK", TYPE_MENU, "", (void *)&main_menu, 0, 0);
     menu_add_item(&static_channels_menu, tmp_item);
 
-    for (uint8_t i = 0; i < 5; i++)
-    {
-        menu_create_item(&tmp_item, "DMX CH", UINT8, "", (void *)&p_to_channels[i]->ch, 0, 255);
+    for (uint8_t i = 0; i < 5; i++) {
+        menu_create_item(&tmp_item, "DMX CH", TYPE_UINT8, "", (void *)&p_to_channels[i]->ch, 0, 255);
         menu_add_item(p_to_menus[i], tmp_item);
-        menu_create_item(&tmp_item, "LEVEL", FLOAT, "V", (void *)&p_to_channels[i]->level, 0, 5);
+        menu_create_item(&tmp_item, "LEVEL", TYPE_FLOAT, "V", (void *)&p_to_channels[i]->level, 0, 5);
         menu_add_item(p_to_menus[i], tmp_item);
-        menu_create_item(&tmp_item, "ATTACK", UINT32, "ms", (void *)&p_to_channels[i]->adsr->attack, 0, 5000);
+        menu_create_item(&tmp_item, "ATTACK", TYPE_UINT32, "ms", (void *)&p_to_channels[i]->adsr->attack, 0, 5000);
         menu_add_item(p_to_menus[i], tmp_item);
-        menu_create_item(&tmp_item, "DECAY", UINT32, "ms", (void *)&p_to_channels[i]->adsr->decay, 0, 5000);
+        menu_create_item(&tmp_item, "DECAY", TYPE_UINT32, "ms", (void *)&p_to_channels[i]->adsr->decay, 0, 5000);
         menu_add_item(p_to_menus[i], tmp_item);
-        menu_create_item(&tmp_item, "SUSTAIN", UINT32, "ms", (void *)&p_to_channels[i]->adsr->sustain, 0, 5000);
+        menu_create_item(&tmp_item, "SUSTAIN", TYPE_UINT32, "ms", (void *)&p_to_channels[i]->adsr->sustain, 0, 5000);
         menu_add_item(p_to_menus[i], tmp_item);
-        menu_create_item(&tmp_item, "S_LEVEL", UINT8, "", (void *)&p_to_channels[i]->adsr->sustain_level, 0, 255);
+        menu_create_item(&tmp_item, "S_LEVEL", TYPE_UINT8, "", (void *)&p_to_channels[i]->adsr->sustain_level, 0, 255);
         menu_add_item(p_to_menus[i], tmp_item);
-        menu_create_item(&tmp_item, "RELEASE", UINT32, "ms", (void *)&p_to_channels[i]->adsr->release, 0, 5000);
+        menu_create_item(&tmp_item, "RELEASE", TYPE_UINT32, "ms", (void *)&p_to_channels[i]->adsr->release, 0, 5000);
         menu_add_item(p_to_menus[i], tmp_item);
         menu_create_item(&tmp_item, "BACK", TYPE_MENU, "", (void *)&main_menu, 0, 0);
         menu_add_item(p_to_menus[i], tmp_item);
@@ -204,8 +208,7 @@ int main(void)
     uint8_t prev_contrast = 0;
     uint8_t prev_brightness = 0;
 
-    for (uint16_t i = 0; i < sizeof(dmx_values); i++)
-    {
+    for (uint16_t i = 0; i < sizeof(dmx_values); i++) {
         dmx_values[i] = 0;
     }
 
@@ -215,53 +218,45 @@ int main(void)
     uint32_t send_data_timer = 0, read_button_timer = 0;
 
     contrast = 9;
-    while (1)
-    {
-        if (device_settings.contrast != prev_contrast)
-        {
+    while (1) {
+        if (device_settings.contrast != prev_contrast) {
             prev_contrast = device_settings.contrast;
             dac_chan_write(&dac_instance, DAC_CHANNEL_0, (device_settings.contrast << 5));
         }
 
-        if (device_settings.brightness != prev_brightness)
-        {
+        if (device_settings.brightness != prev_brightness) {
             set_brightness(device_settings.brightness);
             prev_brightness = device_settings.brightness;
         }
 
-        if (key_pressed)
-        {
+        if (key_pressed) {
             menu_draw();
         }
 
         key_pressed = 1;
-        switch (get_encoder_status())
-        {
-        case BACKWARD:
-            for (uint8_t i = get_encoder_speed(); i > 0; i--)
-                if (state == SCROLL)
-                {
-                    decrement_menu_position(selected_menu);
-                }
-                else
-                    menu_decrement_item(selected_menu);
-            break;
-        case FORWARD:
-            for (uint8_t i = get_encoder_speed(); i > 0; i--)
-                if (state == SCROLL)
-                {
-                    increment_menu_position(selected_menu);
-                }
-                else
-                    menu_increment_item(selected_menu);
-            break;
-        default:
-            key_pressed = 0;
-            break;
+        switch (get_encoder_status()) {
+            case BACKWARD:
+                for (uint8_t i = get_encoder_speed(); i > 0; i--)
+                    if (state == SCROLL) {
+                        decrement_menu_position(selected_menu);
+                    }
+                    else
+                        menu_decrement_item(selected_menu);
+                break;
+            case FORWARD:
+                for (uint8_t i = get_encoder_speed(); i > 0; i--)
+                    if (state == SCROLL) {
+                        increment_menu_position(selected_menu);
+                    }
+                    else
+                        menu_increment_item(selected_menu);
+                break;
+            default:
+                key_pressed = 0;
+                break;
         }
 
-        if (millis() - read_button_timer > 2)
-        {
+        if (millis() - read_button_timer > 2) {
             read_button_timer = millis();
             button_handler(button_read(), &state);
         }
@@ -269,8 +264,7 @@ int main(void)
         if (port_pin_get_input_level(PIN_SW1) == 0)
             adsr_trigger(&adsr_channel0);
 
-        if (millis() - send_data_timer > 70)
-        {
+        if (millis() - send_data_timer > 70) {
             dmx_values[p_to_channels[0]->ch] = adsr_get_value(&adsr_channel0);
             /*dmx_values[1]=get_ADSR_value(&adsr_channel1);
             dmx_values[2]=get_ADSR_value(&adsr_channel2);
@@ -280,13 +274,11 @@ int main(void)
             send_data_timer = millis();
             device_mode = select_device_mode(device_mode_num);
 
-            if (device_mode == DMX || device_mode == BOTH)
-            {
+            if (device_mode == DMX || device_mode == BOTH) {
                 DMX_SendMessage(dmx_values, sizeof(dmx_values));
             }
 
-            if (device_mode == TRIGGER || device_mode == BOTH)
-            {
+            if (device_mode == TRIGGER || device_mode == BOTH) {
                 BREAKPOINT;
                 uint8_t usb_values[] = {adsr_get_value(&adsr_channel0), adsr_get_value(&adsr_channel1), adsr_get_value(&adsr_channel2), adsr_get_value(&adsr_channel3), adsr_get_value(&adsr_channel4)};
                 USB_SendMessage(usb_values, 5);
@@ -297,16 +289,15 @@ int main(void)
 
 MODE select_device_mode(uint8_t mode)
 {
-    switch (mode)
-    {
-    case 0:
-        return DMX;
-    case 1:
-        return TRIGGER;
-    case 2:
-        return BOTH;
-    default:
-        return DMX;
+    switch (mode) {
+        case 0:
+            return DMX;
+        case 1:
+            return TRIGGER;
+        case 2:
+            return BOTH;
+        default:
+            return DMX;
     }
 }
 
@@ -352,7 +343,7 @@ void IO_init(void)
     port_pin_set_config(PIN_LCD_RW, &output_pin);
     port_pin_set_config(PIN_LCD_RS, &output_pin);
     port_pin_set_config(PIN_DMX_DIR, &output_pin);
-
+    port_pin_set_output_level(PIN_EEPROM_WP,0);
     struct system_pinmux_config mux_config;
     system_pinmux_get_config_defaults(&mux_config);
     mux_config.mux_position = MUX_ADC0;
@@ -392,39 +383,35 @@ void configure_dac_channel(void)
 void button_handler(TIPKA t, STATE *s)
 {
     key_pressed = 1;
-    switch (t)
-    {
-    case BUTTON_1:
-        break;
-    case BUTTON_2:
-        if (get_p_to_item(selected_menu)->type == TYPE_MENU)
-        {
-            menu_swap(&selected_menu, (MENU *)(get_p_to_item(selected_menu)->variable));
-            *s = SCROLL;
-        }
-        else if (*s == EDIT)
-            *s = SCROLL;
-        else if (*s == SCROLL)
-            *s = EDIT;
-        break;
-    default:
-        key_pressed = 0;
-        break;
+    switch (t) {
+        case BUTTON_1:
+            break;
+        case BUTTON_2:
+            if (get_p_to_item(selected_menu)->type == TYPE_MENU) {
+                menu_swap(&selected_menu, (MENU *)(get_p_to_item(selected_menu)->variable));
+                *s = SCROLL;
+            }
+            else if (*s == EDIT)
+                *s = SCROLL;
+            else if (*s == SCROLL)
+                *s = EDIT;
+            break;
+        default:
+            key_pressed = 0;
+            break;
     }
     return;
 }
 void menu_draw(void)
 {
     char menu_string_array[4][21];
-    for (uint8_t i = 0; i < 4; i++)
-    {
+    for (uint8_t i = 0; i < 4; i++) {
         for (uint8_t j = 0; j < 20; j++)
             menu_string_array[i][j] = ' ';
         menu_string_array[i][20] = 0;
     }
     menu_whole_string(selected_menu, menu_string_array, state);
-    for (uint8_t i = 0; i < 4; i++)
-    {
+    for (uint8_t i = 0; i < 4; i++) {
         lcd_setCursor(0, i);
         lcd_printstr(menu_string_array[i]);
     }
