@@ -3,18 +3,18 @@
 #include "config.h"
 #include "2004LCD.h"
 
-uint8_t _displayfunction=0;
-uint8_t _displaycontrol=0;
-uint8_t _displaymode=0;
+uint8_t _displayfunction = 0;
+uint8_t _displaycontrol = 0;
+uint8_t _displaymode = 0;
 
 void lcd_begin(void)
 {
 
-    _displayfunction = LCD_2LINE| LCD_8BITMODE | LCD_5x8DOTS;
+    _displayfunction = LCD_2LINE | LCD_8BITMODE | LCD_5x8DOTS;
     delay_ms(50);
-    port_pin_set_output_level(PIN_LCD_RS,0);
-    port_pin_set_output_level(PIN_LCD_RW,0);
-    port_pin_set_output_level(PIN_LCD_EN,0);
+    port_pin_set_output_level(PIN_LCD_RS, 0);
+    port_pin_set_output_level(PIN_LCD_RW, 0);
+    port_pin_set_output_level(PIN_LCD_EN, 0);
 
     delay_ms(50);
 
@@ -54,8 +54,8 @@ void lcd_home()
 
 void lcd_setCursor(uint8_t col, uint8_t row)
 {
-    int row_offsets[] = { 0x00, 0x40, 0x14, 0x54 };
-    if(row>3||col>19)
+    int row_offsets[] = {0x00, 0x40, 0x14, 0x54};
+    if (row > 3 || col > 19)
         return;
     lcd_command(LCD_SETDDRAMADDR | (col + row_offsets[row]));
 }
@@ -143,7 +143,8 @@ void lcd_createChar(uint8_t location, uint8_t charmap[])
 {
     location &= 0x7; // we only have 8 locations 0-7
     lcd_command(LCD_SETCGRAMADDR | (location << 3));
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
         lcd_write(charmap[i]);
     }
 }
@@ -162,10 +163,8 @@ void lcd_send(uint8_t value, uint8_t mode)
 {
 
     port_pin_set_output_level(PIN_LCD_RS, mode);
-    delay_us(1);
-
     lcd_write8bits(value);
-    delay_us(100);
+    delay_us(50);
 }
 
 void lcd_write8bits(uint8_t value)
@@ -178,20 +177,15 @@ void lcd_write8bits(uint8_t value)
     port_pin_set_output_level(PIN_LCD_D5, (value >> 5) & 0x01);
     port_pin_set_output_level(PIN_LCD_D6, (value >> 6) & 0x01);
     port_pin_set_output_level(PIN_LCD_D7, (value >> 7) & 0x01);
-    delay_us(1);
     lcd_pulseEnable();
 }
 
-
-
 void lcd_pulseEnable(void)
 {
-    port_pin_set_output_level(PIN_LCD_EN, 0);
-    delay_us(1);
     port_pin_set_output_level(PIN_LCD_EN, 1);
     delay_us(1);
     port_pin_set_output_level(PIN_LCD_EN, 0);
-    delay_us(100);
+    delay_us(50);
 }
 
 void lcd_load_custom_character(uint8_t char_num, uint8_t *rows)
@@ -206,7 +200,8 @@ void lcd_setBacklight(uint8_t new_val)
 
 void lcd_printstr(char *str)
 {
-    while(*str) {
+    while (*str)
+    {
         lcd_write(*str++);
     }
 }
