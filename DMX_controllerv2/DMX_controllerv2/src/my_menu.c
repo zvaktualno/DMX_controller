@@ -50,23 +50,26 @@ void menu_get_item_string(MENU *m, char *str, uint8_t n) {
         return;
     menu_item *tmp = m->items + n;
     switch(tmp->type) {
-        case UINT8:
+        case  TYPE_UINT8:
             sprintf(tmp->val_str, "%7d", *(uint8_t *)tmp->variable);
             break;
-        case UINT16:
+        case  TYPE_UINT16:
             sprintf(tmp->val_str, "%7d", *(uint16_t *)tmp->variable);
             break;
-        case UINT32:
+        case  TYPE_UINT32:
             sprintf(tmp->val_str, "%7lu", *(uint32_t *)tmp->variable);
             break;
         case TYPE_MENU:
             sprintf(tmp->val_str, "%7s", "");
             break;
-        case FLOAT:
+        case  TYPE_FLOAT:
             ftoe(tmp->val_str, *(float *)tmp->variable);
             break;
+        case TYPE_PRESET:
+            sprintf(tmp->val_str, "%7s", "");
+            break;
         default:
-            strcpy(tmp->val_str, "%7s", "ERROR99");
+            sprintf(tmp->val_str, "%7s", "ERROR99");
             break;
     }
     *(tmp->val_str + 7) = 0;
@@ -133,19 +136,19 @@ void menu_create_item(menu_item *item, const char *name, enum VAR_TYPE typ, cons
 
 void menu_increment_item(MENU *m) {
     switch(m->items[m->curr_pos].type) {
-        case UINT8:
+        case  TYPE_UINT8:
             if((*(uint8_t *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
                 (*(uint8_t *)m->items[m->curr_pos].variable)++;
             break;
-        case UINT16:
+        case  TYPE_UINT16:
             if((*(uint16_t *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
                 (*(uint16_t *)m->items[m->curr_pos].variable)++;
             break;
-        case UINT32:
+        case  TYPE_UINT32:
             if((*(uint32_t *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
                 (*(uint32_t *)m->items[m->curr_pos].variable)++;
             break;
-        case FLOAT:
+        case  TYPE_FLOAT:
             if((*(float *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
                 (*(float *)m->items[m->curr_pos].variable) += 0.1;
             break;
@@ -155,19 +158,19 @@ void menu_increment_item(MENU *m) {
 }
 void menu_decrement_item(MENU *m) {
     switch(m->items[m->curr_pos].type) {
-        case UINT8:
+        case  TYPE_UINT8:
             if((*(uint8_t *)m->items[m->curr_pos].variable) > (m->items[m->curr_pos].val_min))
                 (*(uint8_t *)m->items[m->curr_pos].variable)--;
             break;
-        case UINT16:
+        case  TYPE_UINT16:
             if((*(uint16_t *)m->items[m->curr_pos].variable) > (m->items[m->curr_pos].val_min))
                 (*(uint16_t *)m->items[m->curr_pos].variable)--;
             break;
-        case UINT32:
+        case  TYPE_UINT32:
             if((*(uint32_t *)m->items[m->curr_pos].variable) > (m->items[m->curr_pos].val_min))
                 (*(uint32_t *)m->items[m->curr_pos].variable)--;
             break;
-        case FLOAT:
+        case  TYPE_FLOAT:
             if((*(float *)m->items[m->curr_pos].variable) > (m->items[m->curr_pos].val_min))
                 (*(float *)m->items[m->curr_pos].variable) -= 0.1;
             break;

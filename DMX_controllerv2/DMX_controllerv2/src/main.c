@@ -12,8 +12,7 @@
 #include "2004LCD.h"
 #include "tipke.h"
 
-typedef enum
-{
+typedef enum {
     TRIGGER,
     DMX,
     BOTH
@@ -28,24 +27,19 @@ void button_handler(TIPKA t, STATE *s);
 struct dac_module dac_instance;
 void IO_init(void);
 
-void NMI_Handler(void)
-{
+void NMI_Handler(void) {
     BREAKPOINT;
 }
-void HardFault_Handler(void)
-{
+void HardFault_Handler(void) {
     BREAKPOINT;
 }
-void SVC_Handler(void)
-{
+void SVC_Handler(void) {
     BREAKPOINT;
 }
-void PendSV_Handler(void)
-{
+void PendSV_Handler(void) {
     BREAKPOINT;
 }
-void SysTick_Handler(void)
-{
+void SysTick_Handler(void) {
     BREAKPOINT;
 }
 
@@ -67,8 +61,7 @@ STATE state = SCROLL;
 
 MENU *selected_menu = &main_menu;
 uint8_t key_pressed = 1;
-int main (void)
-{
+int main (void) {
     system_init();
     IO_init();
     lcd_begin();
@@ -91,7 +84,7 @@ int main (void)
     configure_tcc0();
     configure_tcc0_callbacks(&adsr_channel0, &adsr_channel1, &adsr_channel2, &adsr_channel3, &adsr_channel4);
 
-    uint8_t device_mode_num =1;
+    uint8_t device_mode_num = 1;
     MENU *p_to_dmx_group_menus[16];
     for(uint8_t i = 0; i < 16; i++) {
         p_to_dmx_group_menus[i] = (MENU *)malloc(sizeof(MENU));
@@ -116,11 +109,11 @@ int main (void)
     menu_add_item(&main_menu, tmp_item);
 
 
-    menu_create_item(&tmp_item, "CONTRAST", UINT8, "", (void *)&contrast, 0, 16);
+    menu_create_item(&tmp_item, "CONTRAST",  TYPE_UINT8, "", (void *)&contrast, 0, 16);
     menu_add_item(&settings_menu, tmp_item);
-    menu_create_item(&tmp_item, "BRIGHTNES", UINT8, "", (void *)&brightness, 0, 10);
+    menu_create_item(&tmp_item, "BRIGHTNES",  TYPE_UINT8, "", (void *)&brightness, 0, 10);
     menu_add_item(&settings_menu, tmp_item);
-    menu_create_item(&tmp_item, "MODE", UINT8, "", (void *)&device_mode_num, 0, 3);
+    menu_create_item(&tmp_item, "MODE",  TYPE_UINT8, "", (void *)&device_mode_num, 0, 3);
     menu_add_item(&settings_menu, tmp_item);
     menu_create_item(&tmp_item, "BACK", TYPE_MENU, "", (void *)&main_menu, 0, 0);
     menu_add_item(&settings_menu, tmp_item);
@@ -128,9 +121,9 @@ int main (void)
     for(uint16_t i = 0; i < (MAX_DMX_CHANNELS / 16); i++) {
         char menu_item_name[10];
 
-        for(uint16_t j = 0; j < MENU_MAX_ITEMS-1 ; j++) {
+        for(uint16_t j = 0; j < MENU_MAX_ITEMS - 1 ; j++) {
             sprintf(menu_item_name, "DMX%d", i * MENU_MAX_ITEMS + j);
-            menu_create_item(&tmp_item, menu_item_name, UINT8, "", dmx_values + i * 16 + j, -1, 256);
+            menu_create_item(&tmp_item, menu_item_name,  TYPE_UINT8, "", dmx_values + i * 16 + j, -1, 256);
             menu_add_item(p_to_dmx_group_menus[i], tmp_item);
         }
         menu_create_item(&tmp_item, "BACK", TYPE_MENU, "", (void *)&static_channels_menu, 0, 0);
@@ -146,17 +139,17 @@ int main (void)
     menu_add_item(&static_channels_menu, tmp_item);
 
     for(uint8_t i = 0; i < 5; i++) {
-        menu_create_item(&tmp_item, "DMX CH   ", UINT32, "    ", (void *)&p_to_channels[i]->ch, 0, 255);
+        menu_create_item(&tmp_item, "DMX CH   ",  TYPE_UINT32, "    ", (void *)&p_to_channels[i]->ch, 0, 255);
         menu_add_item(p_to_menus[i], tmp_item);
-        menu_create_item(&tmp_item, "LEVEL    ", FLOAT, "    ", (void *)&p_to_channels[i]->level, 0, 255);
+        menu_create_item(&tmp_item, "LEVEL    ",  TYPE_FLOAT, "    ", (void *)&p_to_channels[i]->level, 0, 255);
         menu_add_item(p_to_menus[i], tmp_item);
-        menu_create_item(&tmp_item, "ATTACK   ", UINT32, "  ms", (void *)&p_to_channels[i]->A, 0, 0);
+        menu_create_item(&tmp_item, "ATTACK   ",  TYPE_UINT32, "  ms", (void *)&p_to_channels[i]->A, 0, 0);
         menu_add_item(p_to_menus[i], tmp_item);
-        menu_create_item(&tmp_item, "DECAY    ", UINT32, "  ms", (void *)&p_to_channels[i]->D, 0, 0);
+        menu_create_item(&tmp_item, "DECAY    ",  TYPE_UINT32, "  ms", (void *)&p_to_channels[i]->D, 0, 0);
         menu_add_item(p_to_menus[i], tmp_item);
-        menu_create_item(&tmp_item, "SUSTAIN  ", UINT32, "    ", (void *)&p_to_channels[i]->S, 0, 0);
+        menu_create_item(&tmp_item, "SUSTAIN  ",  TYPE_UINT32, "    ", (void *)&p_to_channels[i]->S, 0, 0);
         menu_add_item(p_to_menus[i], tmp_item);
-        menu_create_item(&tmp_item, "RELEASE  ", UINT32, "  ms", (void *)&p_to_channels[i]->R, 0, 0);
+        menu_create_item(&tmp_item, "RELEASE  ",  TYPE_UINT32, "  ms", (void *)&p_to_channels[i]->R, 0, 0);
         menu_add_item(p_to_menus[i], tmp_item);
         menu_create_item(&tmp_item, "BACK     ", TYPE_MENU, "    ", (void *)&main_menu, 0, 0);
         menu_add_item(p_to_menus[i], tmp_item);
@@ -173,9 +166,9 @@ int main (void)
     configure_adc0_callbacks();*/
 
     device_mode = TRIGGER;
-    uint32_t send_data_timer = 0, read_button_timer =0;
+    uint32_t send_data_timer = 0, read_button_timer = 0;
 
-    contrast=9;
+    contrast = 9;
     while (1) {
         if(contrast != prev_contrast) {
             prev_contrast = contrast;
@@ -190,12 +183,12 @@ int main (void)
         if(key_pressed) {
             for(uint8_t i = 0; i < 4; i++) {
                 for(uint8_t j = 0; j < 20; j++)
-                    test[i][j]=' ';
-                test[i][20]=0;
+                    test[i][j] = ' ';
+                test[i][20] = 0;
             }
             menu_whole_string(selected_menu, test, state);
             for(uint8_t i = 0; i < 4; i++) {
-                lcd_setCursor(0,i);
+                lcd_setCursor(0, i);
                 lcd_printstr(test[i]);
             }
         }
@@ -203,16 +196,16 @@ int main (void)
         key_pressed = 1;
         switch(get_encoder_status()) {
             case BACKWARD:
-                for(uint8_t i=get_encoder_speed(); i>0; i--)
-                    if(state==SCROLL) {
+                for(uint8_t i = get_encoder_speed(); i > 0; i--)
+                    if(state == SCROLL) {
                         decrement_menu_position(selected_menu);
                     }
                     else
                         menu_decrement_item(selected_menu);
                 break;
             case FORWARD:
-                for(uint8_t i=get_encoder_speed(); i>0; i--)
-                    if(state==SCROLL) {
+                for(uint8_t i = get_encoder_speed(); i > 0; i--)
+                    if(state == SCROLL) {
                         increment_menu_position(selected_menu);
                     }
                     else
@@ -223,9 +216,9 @@ int main (void)
                 break;
         }
 
-        if(millis()-read_button_timer>2) {
-            read_button_timer=millis();
-            button_handler(button_read(),&state);
+        if(millis() - read_button_timer > 2) {
+            read_button_timer = millis();
+            button_handler(button_read(), &state);
         }
 
         if(millis() - send_data_timer > 1000) {
@@ -246,8 +239,7 @@ int main (void)
     }
 }
 
-MODE select_device_mode(uint8_t mode)
-{
+MODE select_device_mode(uint8_t mode) {
     switch(device_mode) {
         case 0:
             return DMX;
@@ -260,8 +252,7 @@ MODE select_device_mode(uint8_t mode)
     }
 }
 
-void IO_init(void)
-{
+void IO_init(void) {
     //configure all ports!
     struct port_config input_pin_no_pullup;
     port_get_config_defaults(&input_pin_no_pullup);
@@ -322,16 +313,14 @@ void IO_init(void)
     system_pinmux_pin_set_config(PIN_LCD_VO, &mux_config);
 }
 
-void configure_dac(void)
-{
+void configure_dac(void) {
     struct dac_config config_dac;
     dac_get_config_defaults(&config_dac);
     config_dac.reference = DAC_REFERENCE_AVCC;
     dac_init(&dac_instance, DAC, &config_dac);
 }
 
-void configure_dac_channel(void)
-{
+void configure_dac_channel(void) {
     struct dac_chan_config config_dac_chan;
     dac_chan_get_config_defaults(&config_dac_chan);
 
@@ -340,24 +329,25 @@ void configure_dac_channel(void)
     dac_chan_enable(&dac_instance, DAC_CHANNEL_0);
 }
 
-void button_handler(TIPKA t, STATE *s)
-{
-    key_pressed=1;
+void button_handler(TIPKA t, STATE *s) {
+    key_pressed = 1;
     switch(t) {
         case BUTTON_1:
             break;
         case BUTTON_2:
-            if(get_p_to_item(selected_menu)->type==TYPE_MENU) {
+            if(get_p_to_item(selected_menu)->type == TYPE_MENU) {
                 menu_swap(&selected_menu, (MENU *)(get_p_to_item(selected_menu)->variable));
-                *s= SCROLL;
+                *s = SCROLL;
             }
-            else if(*s== EDIT)
-                *s= SCROLL;
-            else if(*s== SCROLL)
-                *s= EDIT;
+            else
+                if(*s == EDIT)
+                    *s = SCROLL;
+                else
+                    if(*s == SCROLL)
+                        *s = EDIT;
             break;
         default:
-            key_pressed=0;
+            key_pressed = 0;
             break;
     }
     return;
