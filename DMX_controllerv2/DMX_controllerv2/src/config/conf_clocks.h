@@ -115,7 +115,7 @@
 #  define CONF_CLOCK_GCLK_5_ENABLE                true
 #  define CONF_CLOCK_GCLK_5_RUN_IN_STANDBY        false
 #  define CONF_CLOCK_GCLK_5_CLOCK_SOURCE          SYSTEM_CLOCK_SOURCE_OSC48M
-#  define CONF_CLOCK_GCLK_5_PRESCALER             1
+#  define CONF_CLOCK_GCLK_5_PRESCALER             40
 #  define CONF_CLOCK_GCLK_5_OUTPUT_ENABLE         false
 
 /* Configure GCLK generator 6 */

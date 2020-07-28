@@ -14,7 +14,7 @@
 #include "2004LCD.h"
 #include "tipke.h"
 #include "i2c_fs.h"
-
+//AC sync bug: https://borkedlabs.com/blog/2017/10-12-samc21-ac-comparator-sync/
 typedef enum {
     TRIGGER,
     DMX,
@@ -80,12 +80,17 @@ int main(void) {
         adsr_channels[i].sustain_level = 127;
         trigger_channels[i].adsr = adsr_channels + i;
         p_to_channels[i] = trigger_channels + i;
+        p_to_channels[i]->dmx_ch = i;
+        p_to_channels[i]->note = MIDI_NOTE_A4;
+        p_to_channels[i]->midi_ch = i + 1;
+        p_to_channels[i]->input_channel = i + 1;
     }
 
     system_init();
     delay_init();
-    configure_i2c();
 
+    configure_i2c();
+    configure_ac(adsr_channels);
     IO_init();
     lcd_begin();
     lcd_noCursor();
@@ -103,7 +108,8 @@ int main(void) {
 
 
     NVIC_SetPriority(SERCOM3_IRQn, 3);
-    NVIC_SetPriority(ADC0_IRQn, 1);
+    NVIC_SetPriority(AC_IRQn, 4);
+    NVIC_SetPriority(ADC0_IRQn, 5);
     NVIC_SetPriority(DMX_IRQn, 2);
     Enable_global_interrupt();
     delay_ms(100);
@@ -123,7 +129,7 @@ int main(void) {
 
 
     menu_item tmp_item;
-
+    device_settings.mode = 1;
     menu_create_item(&tmp_item, "SETTINGS", TYPE_MENU, "", (void *)&settings_menu, 0, 0, NULL);
     menu_add_item(&main_menu, tmp_item);
     menu_create_item(&tmp_item, "CHANNEL 1", TYPE_MENU, "", (void *)p_to_menus[0], 0, 0, NULL);
@@ -170,12 +176,10 @@ int main(void) {
     menu_add_item(&static_channels_menu, tmp_item);
 
     for (uint8_t i = 0; i < 5; i++) {
-        p_to_channels[i]->note = MIDI_NOTE_A4;
-        p_to_channels[i]->midi_ch = i;
-        p_to_channels[i]->input_channel = i + 1;
+
         menu_create_item(&tmp_item,  "INPUT", TYPE_UINT8, "", (void *)&p_to_channels[i]->input_channel, 1, 5, NULL);
         menu_add_item(p_to_menus[i], tmp_item);
-        menu_create_item(&tmp_item, "DMX CHAN", TYPE_UINT8, "", (void *)&p_to_channels[i]->ch, 0, 255, NULL);
+        menu_create_item(&tmp_item, "DMX CHAN", TYPE_UINT8, "", (void *)&p_to_channels[i]->dmx_ch, 0, 255, NULL);
         menu_add_item(p_to_menus[i], tmp_item);
         menu_create_item(&tmp_item, "LEVEL", TYPE_FLOAT, "V", (void *)&p_to_channels[i]->level, 0, 5, NULL);
         menu_add_item(p_to_menus[i], tmp_item);
@@ -257,7 +261,7 @@ int main(void) {
 
         if (millis() - send_data_timer > 70) {
             for(uint8_t i = 0; i < 5; i++)
-                dmx_values[p_to_channels[i]->ch] = adsr_get_value(adsr_channels + p_to_channels[i]->input_channel - 1);
+                dmx_values[p_to_channels[i]->dmx_ch] = adsr_get_value(adsr_channels + p_to_channels[i]->input_channel - 1);
 
             send_data_timer = millis();
             device_mode = select_device_mode(device_settings.mode);
@@ -269,7 +273,7 @@ int main(void) {
             if (device_mode == TRIGGER || device_mode == BOTH) {
                 BREAKPOINT;
                 for(uint8_t i = 0; i < 5; i++)
-                    MIDI_send_note_on(p_to_channels[i]->midi_ch, p_to_channels[i]->note, 0);
+                    MIDI_send_note_on(p_to_channels[i]->midi_ch, p_to_channels[i]->note, dmx_values[p_to_channels[i]->dmx_ch]);
             }
         }
     }
