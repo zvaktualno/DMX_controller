@@ -62,8 +62,7 @@ void lcd_write(uint8_t value);
 void lcd_send(uint8_t value, uint8_t mode);
 void lcd_write8bits(uint8_t value);
 void lcd_pulseEnable(void);
-void lcd_load_custom_character(uint8_t char_num, uint8_t *rows);
 void lcd_printstr(char *str);
-
+void lcd_create_bar_charts(void);
 
 #endif

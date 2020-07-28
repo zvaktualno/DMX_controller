@@ -68,8 +68,9 @@ void menu_get_item_string(MENU *m, char *str, uint8_t n) {
         case TYPE_PRESET:
             sprintf(tmp->val_str, "%s", "");
             break;
+        case TYPE_BAR:
         case TYPE_ENUM:
-            sprintf(tmp->val_str, "%s", "");
+            tmp->getter(tmp->val_str, *(uint8_t *)tmp->variable);
             break;
         default:
             sprintf(tmp->val_str, "%s", "ERROR99");
@@ -77,11 +78,21 @@ void menu_get_item_string(MENU *m, char *str, uint8_t n) {
     }
     *(tmp->val_str + 7) = 0;
     char item_str[21];
-    if(n == m->curr_pos) {
-        sprintf(item_str, "%c%-9s%6s%4s", '~', tmp->name, tmp->val_str, tmp->units);
+    if(strcmp(tmp->units, "") == 0) {
+        if(n == m->curr_pos) {
+            sprintf(item_str, "%c%-10s%9s", '~', tmp->name, tmp->val_str, tmp->units);
+        }
+        else
+            sprintf(item_str, "%-10s%10s", tmp->name, tmp->val_str, tmp->units);
     }
-    else
-        sprintf(item_str, "%-9s%7s%4s", tmp->name, tmp->val_str, tmp->units);
+    else {
+        if(n == m->curr_pos) {
+            sprintf(item_str, "%c%-10s%7s%2s", '~', tmp->name, tmp->val_str, tmp->units);
+        }
+        else
+            sprintf(item_str, "%-10s%8s%2s", tmp->name, tmp->val_str, tmp->units);
+    }
+
     memcpy(str, item_str, 20);
 
 }
@@ -104,7 +115,7 @@ void menu_whole_solo_string(MENU *m, char *s) {
     p_to_item->name[sizeof(p_to_item->name) - 1] = 0;
     p_to_item->val_str[sizeof(p_to_item->val_str) - 1] = 0;
 
-    memcpy(s + 21, p_to_item->name, string_length);
+    memcpy(s + 21, p_to_item->full_name, string_length);
     memcpy(s + 42, p_to_item->val_str, value_length);
     memcpy(s + 42 + value_length + 1, p_to_item->units, strlen(p_to_item->units));
 }
@@ -125,33 +136,35 @@ void menu_whole_string(MENU *m, char *s, STATE state) {
 
 }
 
-void menu_create_item(menu_item *item, const char *name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val) {
-    strcpy(item->name, "         ");
-    strcpy(item->name, name);
-    strcpy(item->units, "    ");
+void menu_create_item(menu_item *item, const char *full_name, const char *short_name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val, void *getter) {
+
+    strcpy(item->name, short_name);
+    strcpy(item->full_name, full_name);
     strcpy(item->units, units);
-    strcpy(item->val_str, "       ");
     item->type = typ;
     item->variable = p_variable;
     item->val_max = max_val;
     item->val_min = min_val;
+    item->getter = getter;
 }
 
 void menu_increment_item(MENU *m) {
     switch(m->items[m->curr_pos].type) {
-        case  TYPE_UINT8:
+        case TYPE_BAR:
+        case TYPE_ENUM:
+        case TYPE_UINT8:
             if((*(uint8_t *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
                 (*(uint8_t *)m->items[m->curr_pos].variable)++;
             break;
-        case  TYPE_UINT16:
+        case TYPE_UINT16:
             if((*(uint16_t *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
                 (*(uint16_t *)m->items[m->curr_pos].variable)++;
             break;
-        case  TYPE_UINT32:
+        case TYPE_UINT32:
             if((*(uint32_t *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
                 (*(uint32_t *)m->items[m->curr_pos].variable) += 10;
             break;
-        case  TYPE_FLOAT:
+        case TYPE_FLOAT:
             if((*(float *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
                 (*(float *)m->items[m->curr_pos].variable) += 0.1;
             break;
@@ -161,7 +174,9 @@ void menu_increment_item(MENU *m) {
 }
 void menu_decrement_item(MENU *m) {
     switch(m->items[m->curr_pos].type) {
-        case  TYPE_UINT8:
+        case TYPE_BAR:
+        case TYPE_ENUM:
+        case TYPE_UINT8:
             if((*(uint8_t *)m->items[m->curr_pos].variable) > (m->items[m->curr_pos].val_min))
                 (*(uint8_t *)m->items[m->curr_pos].variable)--;
             break;

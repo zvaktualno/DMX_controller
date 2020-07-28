@@ -6,18 +6,19 @@
 #define MENU_MAX_ITEMS 17
 
 enum VAR_TYPE {
-    TYPE_UINT8,  TYPE_UINT16,  TYPE_UINT32,  TYPE_FLOAT, TYPE_MENU, TYPE_BAR, TYPE_PRESET, TYPE_ENUM
+    TYPE_UINT8,  TYPE_UINT16,  TYPE_UINT32,  TYPE_FLOAT, TYPE_MENU, TYPE_BAR, TYPE_PRESET, TYPE_ENUM,
 };
 
 typedef struct {
     enum VAR_TYPE type;
-    char name[10];
-    char units [5];
+    char full_name[1];
+    char name[11];
+    char units [3];
     void *variable;
-    char val_str[8];
+    char val_str[9];
     float val_min;
     float val_max;
-    void *getter;
+    void (*getter)(char *dest, uint8_t mode);
 } menu_item;
 
 typedef struct {
@@ -31,14 +32,13 @@ typedef struct {
 
 void menu_init(void);
 void menu_add_item(MENU *m, menu_item item);
-void create_bar_chars(void);
 void increment_menu_position(MENU *m);
 void decrement_menu_position(MENU *m);
 uint8_t get_menu_position(MENU *m);
 menu_item *get_p_to_item(MENU *m);
 void menu_get_item_string(MENU *m, char *str, uint8_t n);
 void menu_whole_string(MENU *m, char *s, STATE state);
-void menu_create_item(menu_item *item, const char *name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val);
+void menu_create_item(menu_item *item, const char *full_name, const char *short_name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val, void *getter);
 void menu_increment_item(MENU *m);
 void menu_decrement_item(MENU *m);
 void menu_swap(MENU **dest, MENU *src);
