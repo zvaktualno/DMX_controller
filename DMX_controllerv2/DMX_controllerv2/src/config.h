@@ -69,6 +69,7 @@ typedef struct {
     float level;
     uint8_t midi_ch;
     uint8_t note;
+    uint8_t input_channel;
 } channel;
 typedef enum {
     SCROLL,

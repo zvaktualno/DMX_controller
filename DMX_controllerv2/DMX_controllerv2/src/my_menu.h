@@ -11,7 +11,6 @@ enum VAR_TYPE {
 
 typedef struct {
     enum VAR_TYPE type;
-    char full_name[1];
     char name[11];
     char units [3];
     void *variable;
@@ -38,7 +37,7 @@ uint8_t get_menu_position(MENU *m);
 menu_item *get_p_to_item(MENU *m);
 void menu_get_item_string(MENU *m, char *str, uint8_t n);
 void menu_whole_string(MENU *m, char *s, STATE state);
-void menu_create_item(menu_item *item, const char *full_name, const char *short_name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val, void *getter);
+void menu_create_item(menu_item *item, const char *short_name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val, void *getter);
 void menu_increment_item(MENU *m);
 void menu_decrement_item(MENU *m);
 void menu_swap(MENU **dest, MENU *src);

@@ -115,7 +115,7 @@ void menu_whole_solo_string(MENU *m, char *s) {
     p_to_item->name[sizeof(p_to_item->name) - 1] = 0;
     p_to_item->val_str[sizeof(p_to_item->val_str) - 1] = 0;
 
-    memcpy(s + 21, p_to_item->full_name, string_length);
+    memcpy(s + 21, p_to_item->name, string_length);
     memcpy(s + 42, p_to_item->val_str, value_length);
     memcpy(s + 42 + value_length + 1, p_to_item->units, strlen(p_to_item->units));
 }
@@ -136,10 +136,9 @@ void menu_whole_string(MENU *m, char *s, STATE state) {
 
 }
 
-void menu_create_item(menu_item *item, const char *full_name, const char *short_name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val, void *getter) {
+void menu_create_item(menu_item *item, const char *short_name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val, void *getter) {
 
     strcpy(item->name, short_name);
-    strcpy(item->full_name, full_name);
     strcpy(item->units, units);
     item->type = typ;
     item->variable = p_variable;
