@@ -103,10 +103,10 @@ void timer0_compare_callback(struct tcc_module *const module_inst)
 }
 uint8_t get_encoder_speed(void)
 {
-    if(encoder_timer>30)return 1;
-    if(encoder_timer>20)return 2;
-    if(encoder_timer>10)return 5;
-    return 10;
+    if(encoder_timer>20)return 1;
+    if(encoder_timer>15)return 2;
+    if(encoder_timer>10)return 3;
+    return 4;
 }
 
 void configure_tc0(void)

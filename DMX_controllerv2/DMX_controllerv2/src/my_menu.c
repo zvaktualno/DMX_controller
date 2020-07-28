@@ -42,7 +42,7 @@ void ftoe(char *s, float val) {
     float fract = val - whole;
     uint32_t whole_fract = fract * 1000;
     //ne dela v primeru 4.05
-    sprintf(s, "%3lu.%03lu", whole, whole_fract);
+    sprintf(s, "%lu.%03lu", whole, whole_fract);
 }
 
 void menu_get_item_string(MENU *m, char *str, uint8_t n) {
@@ -51,35 +51,38 @@ void menu_get_item_string(MENU *m, char *str, uint8_t n) {
     menu_item *tmp = m->items + n;
     switch(tmp->type) {
         case  TYPE_UINT8:
-            sprintf(tmp->val_str, "%7d", *(uint8_t *)tmp->variable);
+            sprintf(tmp->val_str, "%d", *(uint8_t *)tmp->variable);
             break;
         case  TYPE_UINT16:
-            sprintf(tmp->val_str, "%7d", *(uint16_t *)tmp->variable);
+            sprintf(tmp->val_str, "%d", *(uint16_t *)tmp->variable);
             break;
         case  TYPE_UINT32:
-            sprintf(tmp->val_str, "%7lu", *(uint32_t *)tmp->variable);
+            sprintf(tmp->val_str, "%lu", *(uint32_t *)tmp->variable);
             break;
         case TYPE_MENU:
-            sprintf(tmp->val_str, "%7s", "");
+            sprintf(tmp->val_str, "%s", "");
             break;
-        case  TYPE_FLOAT:
+        case TYPE_FLOAT:
             ftoe(tmp->val_str, *(float *)tmp->variable);
             break;
         case TYPE_PRESET:
-            sprintf(tmp->val_str, "%7s", "");
+            sprintf(tmp->val_str, "%s", "");
+            break;
+        case TYPE_ENUM:
+            sprintf(tmp->val_str, "%s", "");
             break;
         default:
-            sprintf(tmp->val_str, "%7s", "ERROR99");
+            sprintf(tmp->val_str, "%s", "ERROR99");
             break;
     }
     *(tmp->val_str + 7) = 0;
-    char test[21];
+    char item_str[21];
     if(n == m->curr_pos) {
-        sprintf(test, "%c%-9s%6s%4s", '~', tmp->name, tmp->val_str, tmp->units);
+        sprintf(item_str, "%c%-9s%6s%4s", '~', tmp->name, tmp->val_str, tmp->units);
     }
     else
-        sprintf(test, "%-9s%7s%4s", tmp->name, tmp->val_str, tmp->units);
-    memcpy(str, test, 20);
+        sprintf(item_str, "%-9s%7s%4s", tmp->name, tmp->val_str, tmp->units);
+    memcpy(str, item_str, 20);
 
 }
 
@@ -146,7 +149,7 @@ void menu_increment_item(MENU *m) {
             break;
         case  TYPE_UINT32:
             if((*(uint32_t *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
-                (*(uint32_t *)m->items[m->curr_pos].variable)+=10;
+                (*(uint32_t *)m->items[m->curr_pos].variable) += 10;
             break;
         case  TYPE_FLOAT:
             if((*(float *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
@@ -168,13 +171,13 @@ void menu_decrement_item(MENU *m) {
             break;
         case  TYPE_UINT32:
             if((*(uint32_t *)m->items[m->curr_pos].variable) > (m->items[m->curr_pos].val_min))
-                (*(uint32_t *)m->items[m->curr_pos].variable)-=10;
+                (*(uint32_t *)m->items[m->curr_pos].variable) -= 10;
             break;
         case  TYPE_FLOAT:
             if((*(float *)m->items[m->curr_pos].variable) > (m->items[m->curr_pos].val_min))
                 (*(float *)m->items[m->curr_pos].variable) -= 0.1;
             if(*(float *)m->items[m->curr_pos].variable < 0)
-                *(float *)m->items[m->curr_pos].variable=0;
+                *(float *)m->items[m->curr_pos].variable = 0;
             break;
         default:
             break;

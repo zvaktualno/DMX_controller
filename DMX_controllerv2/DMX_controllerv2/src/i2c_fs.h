@@ -1,15 +1,14 @@
 #ifndef I2C_FS_H_
 #define I2C_FS_H_
 
-#define EEPROM_ADDR 0b1010111
+#define EEPROM_ADDR 0b1010000
 #define MAX_SAVES 32
 #define MEMORY_SIZE 0x3FF
 #define MEMORY_PAGE_SIZE 64
 #define MEMORY_MAP_SIZE 64
 #define MEMORY_MAP_SIZE_BYTES 8
 
-typedef struct
-{
+typedef struct {
     uint32_t memory_map;
     uint8_t num_of_saves;
 } I2C_FS;

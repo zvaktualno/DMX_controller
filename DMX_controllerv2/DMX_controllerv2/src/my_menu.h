@@ -6,7 +6,7 @@
 #define MENU_MAX_ITEMS 17
 
 enum VAR_TYPE {
-    TYPE_UINT8,  TYPE_UINT16,  TYPE_UINT32,  TYPE_FLOAT, TYPE_MENU, TYPE_BAR, TYPE_PRESET
+    TYPE_UINT8,  TYPE_UINT16,  TYPE_UINT32,  TYPE_FLOAT, TYPE_MENU, TYPE_BAR, TYPE_PRESET, TYPE_ENUM
 };
 
 typedef struct {
@@ -17,6 +17,7 @@ typedef struct {
     char val_str[8];
     float val_min;
     float val_max;
+    void *getter;
 } menu_item;
 
 typedef struct {

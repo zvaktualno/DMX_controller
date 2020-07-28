@@ -63,37 +63,34 @@
 #define MUX_ADC4 PINMUX_PA03B_ADC0_AIN1
 #define MUX_LCD_VO PINMUX_PA02B_DAC_VOUT
 
-typedef struct
-{
+typedef struct {
     uint32_t ch;
     ADSR *adsr;
     float level;
+    uint8_t midi_ch;
+    uint8_t note;
 } channel;
-typedef enum
-{
+typedef enum {
     SCROLL,
     EDIT,
 } STATE ;
-typedef struct
-{
+typedef struct {
     char preset_name[10];
     uint16_t position;
     uint8_t channels[512];
     channel ch;
 } PRESET;
 
-typedef enum
-{
+typedef enum {
     BUTTON_NONE,
     BUTTON_1,
     BUTTON_2,
 } TIPKA;
 
-typedef struct
-{
+typedef struct {
     uint8_t contrast;
     uint8_t brightness;
     uint8_t fixture_size;
-    STATE mode;
+    uint8_t mode;
 } SETTINGS;
 #endif
