@@ -5,6 +5,7 @@
 #include "my_menu.h"
 //#include "functions.h"
 
+extern uint8_t dmx_values[256];
 
 void menu_add_item(MENU *m, menu_item item) {
     if(m->num_of_items == MENU_MAX_ITEMS)
@@ -67,6 +68,9 @@ void menu_get_item_string(MENU *m, char *str, uint8_t n) {
             break;
         case TYPE_PRESET:
             sprintf(tmp->val_str, "%s", "");
+            break;
+        case TYPE_DMX_CH:
+            tmp->getter(tmp->val_str, (uint8_t *)tmp->variable - dmx_values);
             break;
         case TYPE_BAR:
         case TYPE_ENUM:
@@ -150,6 +154,7 @@ void menu_create_item(menu_item *item, const char *short_name, enum VAR_TYPE typ
 void menu_increment_item(MENU *m) {
     switch(m->items[m->curr_pos].type) {
         case TYPE_BAR:
+        case TYPE_DMX_CH:
         case TYPE_ENUM:
         case TYPE_UINT8:
             if((*(uint8_t *)m->items[m->curr_pos].variable) < (m->items[m->curr_pos].val_max))
@@ -175,6 +180,7 @@ void menu_decrement_item(MENU *m) {
     switch(m->items[m->curr_pos].type) {
         case TYPE_BAR:
         case TYPE_ENUM:
+        case TYPE_DMX_CH:
         case TYPE_UINT8:
             if((*(uint8_t *)m->items[m->curr_pos].variable) > (m->items[m->curr_pos].val_min))
                 (*(uint8_t *)m->items[m->curr_pos].variable)--;

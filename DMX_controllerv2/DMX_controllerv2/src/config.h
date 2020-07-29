@@ -73,17 +73,21 @@
 #define MUX_LCD_VO PINMUX_PA02B_DAC_VOUT
 
 typedef struct {
-    float level;
+    uint8_t level;
+    uint8_t enabled;
     uint32_t dmx_ch;
     uint8_t input_channel;
     uint8_t midi_ch;
     uint8_t note;
     ADSR *adsr;
+    uint8_t triggered;
 } channel;
+
 typedef enum {
     SCROLL,
     EDIT,
 } STATE ;
+
 typedef struct {
     char preset_name[10];
     uint16_t position;

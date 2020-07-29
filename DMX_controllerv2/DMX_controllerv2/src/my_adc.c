@@ -1,24 +1,22 @@
 #include <asf.h>
 #include "config.h"
 #include "my_adc.h"
-#include "adsr.h"
 
 
 
 volatile uint8_t adc0_read_done_flag;
-ADSR *adsr0, *adsr1, *adsr2, *adsr3, *adsr4;
+channel *ch0, *ch1, *ch2, *ch3, *ch4;
 uint8_t adc_ch = 0;
 int16_t result[5];
-
 struct adc_module adc0_instance;
 static struct ac_module ac_instance;
 
-void configure_adc0(ADSR *adsr) {
-    adsr0 = adsr + 0;
-    adsr1 = adsr + 1;
-    adsr2 = adsr + 2;
-    adsr3 = adsr + 3;
-    adsr4 = adsr + 4;
+void configure_adc0(channel *p_to_ch) {
+    ch0 = p_to_ch + 0;
+    ch1 = p_to_ch + 1;
+    ch2 = p_to_ch + 2;
+    ch3 = p_to_ch + 3;
+    ch4 = p_to_ch + 4;
 
     struct adc_config config_adc;
     adc_get_config_defaults(&config_adc);
@@ -29,7 +27,7 @@ void configure_adc0(ADSR *adsr) {
     config_adc.resolution                    = ADC_RESOLUTION_10BIT;
     config_adc.window.window_mode            = ADC_WINDOW_MODE_ABOVE_LOWER;
     config_adc.window.window_upper_value     = 0;
-    config_adc.window.window_lower_value     = 150;
+    config_adc.window.window_lower_value     = 1023;
     config_adc.positive_input                = ADC_POSITIVE_INPUT_PIN6;
     config_adc.negative_input                = ADC_NEGATIVE_INPUT_GND;
     config_adc.left_adjust                   = false;
@@ -56,21 +54,23 @@ void adc0_read_callback(void) {
 
     if(++adc_ch == 2)adc_ch = 0;
     adc0_change_channel(adc_ch);
+    if(adc_ch == 0)
+        adc0_set_compare_value(ch3->level << 5);
+    if(adc_ch == 1)
+        adc0_set_compare_value(ch4->level << 5);
     adc_read_buffer_job(&adc0_instance, result + adc_ch, 1);
 
 }
 void adc0_window_callback(void) {
-    switch(adc_ch) {
-        case 0:
-            adsr_trigger(adsr3);
-            break;
-        case 1:
-            adsr_trigger(adsr4);
-            break;
+    if(result[0] > ch3->level << 5) {
+        trigger_channel(3);
+    }
+    if(result[1] > ch4->level << 5) {
+        trigger_channel(4);
     }
 }
-void adc0_set_compare_value(uint8_t value) {
-    adc_set_window_mode(&adc0_instance, ADC_WINDOW_MODE_ABOVE_LOWER, 90, 255);
+void adc0_set_compare_value(uint16_t value) {
+    adc_set_window_mode(&adc0_instance, ADC_WINDOW_MODE_ABOVE_LOWER, value, 1023);
 }
 void adc0_change_channel(uint8_t channel) {
     if(channel > 1)
@@ -82,15 +82,12 @@ void adc0_change_channel(uint8_t channel) {
 }
 
 
-
-
-void configure_ac(ADSR *adsr) {
-
-    adsr0 = adsr + 0;
-    adsr1 = adsr + 1;
-    adsr2 = adsr + 2;
-    adsr3 = adsr + 3;
-    adsr4 = adsr + 4;
+void configure_ac(channel *p_to_ch) {
+    ch0 = p_to_ch + 0;
+    ch1 = p_to_ch + 1;
+    ch2 = p_to_ch + 2;
+    ch3 = p_to_ch + 3;
+    ch4 = p_to_ch + 4;
 
     struct ac_config config_ac;
     ac_get_config_defaults(&config_ac);
@@ -165,13 +162,13 @@ void configure_ac_channel2(void) {
 
 
 void callback_function_ac0(struct ac_module *const module_inst) {
-    adsr_trigger(adsr0);
+    trigger_channel(0);
 }
 void callback_function_ac1(struct ac_module *const module_inst) {
-    adsr_trigger(adsr1);
+    trigger_channel(1);
 }
 void callback_function_ac2(struct ac_module *const module_inst) {
-    adsr_trigger(adsr2);
+    trigger_channel(2);
 }
 
 void configure_ac_callback(void) {
@@ -181,4 +178,24 @@ void configure_ac_callback(void) {
     ac_enable_callback(&ac_instance, AC_CALLBACK_COMPARATOR_0);
     ac_enable_callback(&ac_instance, AC_CALLBACK_COMPARATOR_1);
     ac_enable_callback(&ac_instance, AC_CALLBACK_COMPARATOR_2);
+}
+
+void trigger_channel(uint8_t ch) {
+    ch++;
+    if(ch0->input_channel == ch)
+        adsr_trigger(ch0->adsr);
+    if(ch1->input_channel == ch)
+        adsr_trigger(ch1->adsr);
+    if(ch2->input_channel == ch)
+        adsr_trigger(ch2->adsr);
+    if(ch3->input_channel == ch)
+        adsr_trigger(ch3->adsr);
+    if(ch4->input_channel == ch)
+        adsr_trigger(ch4->adsr);
+}
+
+void ac_set_scaler(uint8_t ac_channel, uint8_t value) {
+    if(ac_channel > 2)
+        return;
+    AC->SCALER[ac_channel].reg = value << 1;
 }
