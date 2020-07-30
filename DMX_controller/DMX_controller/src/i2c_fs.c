@@ -7,21 +7,24 @@
 
 I2C_FS fs;
 /* Gets all saves. */
-void memory_init(void) {
+void memory_init(void)
+{
     fs.memory_map = 0;
     read_memory_map();
     get_num_of_saves();
 }
 
 /* Reads the memory map */
-void read_memory_map(void) {
+void read_memory_map(void)
+{
     uint8_t i2c_packet[2] = {0, 0};
     i2c_read(EEPROM_ADDR, i2c_packet, MEMORY_MAP_SIZE_BYTES);
     fs.memory_map = *(uint32_t *)i2c_get_rx_Buffer();
 }
 
 /* Writes the memory map */
-void write_memory_map(void) {
+void write_memory_map(void)
+{
     uint8_t i2c_packet[10] = {0, 0};
     for (uint8_t i = 0; i < MEMORY_MAP_SIZE_BYTES; i++)
         i2c_packet[i + 2] = (fs.memory_map >> (i * 8)) & 0xFF;
@@ -29,7 +32,8 @@ void write_memory_map(void) {
 }
 
 /* Converts preset position to a actual pointer in memory. Returns -1 if preset isn't in memory map. */
-uint16_t preset_get_mem_pos(uint8_t position) {
+uint16_t preset_get_mem_pos(uint8_t position)
+{
     if (position > MAX_SAVES)
         return 0xFFFF;
 
@@ -42,7 +46,8 @@ uint16_t preset_get_mem_pos(uint8_t position) {
 }
 
 /* Checks the memory map and counts saves. */
-void get_num_of_saves(void) {
+void get_num_of_saves(void)
+{
     uint8_t stevec = 0;
     for (uint8_t i = 0; i < MAX_SAVES; i++) {
         if (fs.memory_map & (1ULL << i))
@@ -52,7 +57,8 @@ void get_num_of_saves(void) {
 }
 
 /* Loads the preset from 0-MAX_SAVES, returns 0 if it fails, 1 on success*/
-uint8_t read_memory(PRESET *preset, uint8_t position) {
+uint8_t read_memory(PRESET *preset, uint8_t position)
+{
 
     if(!(fs.memory_map & (1 << position)))
         return 0;
@@ -70,11 +76,13 @@ uint8_t read_memory(PRESET *preset, uint8_t position) {
 }
 
 /* Deletes the preset. */
-void preset_delete(PRESET *preset) {
+void preset_delete(PRESET *preset)
+{
     fs.memory_map &= ~(1UL << preset->position);
     write_memory_map();
 }
-void memory_full_format(void) {
+void memory_full_format(void)
+{
     uint8_t null_array[66];
     for (uint8_t i = 0; i < 66; i++)
         null_array[i] = 0;
@@ -86,12 +94,14 @@ void memory_full_format(void) {
     read_memory_map();
 }
 
-void memory_format(void) {
+void memory_format(void)
+{
     fs.memory_map = 0;
     write_memory_map();
 }
 
-void write_memory(PRESET *preset, uint8_t position) {
+void write_memory(PRESET *preset, uint8_t position)
+{
     volatile uint16_t remaining_size = sizeof(PRESET);
 
     uint8_t send_packet[66];
@@ -129,8 +139,12 @@ void write_memory(PRESET *preset, uint8_t position) {
     return;
 }
 
-void memory_load_preset(channel **ch, uint8_t *dmx_ch, uint8_t pos) {
+void memory_load_preset(channel **ch,SETTINGS *settings, uint8_t *dmx_ch, uint8_t pos)
+{
     PRESET preset;
+    settings->contrast = preset.contrast;
+    settings->brightness = preset.brightness;
+    settings->mode=preset.mode;
     if(!read_memory(&preset, pos))return;
     for(uint16_t i = 0; i < 256; i++) {
         *(dmx_ch + i) = *(preset.channels + i);
@@ -150,8 +164,12 @@ void memory_load_preset(channel **ch, uint8_t *dmx_ch, uint8_t pos) {
     }
 }
 
-void memory_write_preset(channel **ch, uint8_t *dmx_ch, uint8_t pos) {
+void memory_write_preset(channel **ch,SETTINGS *settings, uint8_t *dmx_ch, uint8_t pos)
+{
     PRESET preset;
+    preset.contrast = settings->contrast;
+    preset.brightness = settings->brightness;
+    preset.mode = settings->mode;
 
     for(uint16_t i = 0; i < 256; i++) {
         *(preset.channels + i) = *(dmx_ch + i);
@@ -172,7 +190,8 @@ void memory_write_preset(channel **ch, uint8_t *dmx_ch, uint8_t pos) {
 
     write_memory(&preset, pos);
 }
-void memory_get_preset_name(char *dest, uint8_t num) {
+void memory_get_preset_name(char *dest, uint8_t num)
+{
     PRESET preset;
     if(num == 0) {
         sprintf(dest, "");

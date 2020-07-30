@@ -7,8 +7,9 @@
 
 extern uint8_t dmx_values[256];
 
-void menu_add_item(MENU *m, menu_item item) {
-    if(m->num_of_items == MENU_MAX_ITEMS)
+void menu_add_item(MENU *m, menu_item item)
+{
+    if(m->num_of_items >= MENU_MAX_ITEMS)
         return;
     m->items[m->num_of_items] = item;
     m->num_of_items++;
@@ -16,29 +17,34 @@ void menu_add_item(MENU *m, menu_item item) {
     m->curr_window_pos = 0;
 }
 
-void increment_menu_position(MENU *m) {
+void increment_menu_position(MENU *m)
+{
     if(m->curr_pos < m->num_of_items - 1)
         m->curr_pos++;
     if((m->curr_pos - m->curr_window_pos) == 4)
         m->curr_window_pos++;
 }
 
-void decrement_menu_position(MENU *m) {
+void decrement_menu_position(MENU *m)
+{
     if(m->curr_pos > 0)
         m->curr_pos--;
     if(m->curr_pos < m->curr_window_pos)
         m->curr_window_pos--;
 }
 
-uint8_t get_menu_position(MENU *m) {
+uint8_t get_menu_position(MENU *m)
+{
     return m->curr_pos;
 }
 
-menu_item *get_p_to_item(MENU *m) {
+menu_item *get_p_to_item(MENU *m)
+{
     return &(m->items[m->curr_pos]);
 }
 
-void ftoe(char *s, float val) {
+void ftoe(char *s, float val)
+{
     uint32_t whole = (int) val;
     float fract = val - whole;
     uint32_t whole_fract = fract * 1000;
@@ -46,7 +52,8 @@ void ftoe(char *s, float val) {
     sprintf(s, "%lu.%03lu", whole, whole_fract);
 }
 
-void menu_get_item_string(MENU *m, char *str, uint8_t n) {
+void menu_get_item_string(MENU *m, char *str, uint8_t n)
+{
     if(n >= m->num_of_items)
         return;
     menu_item *tmp = m->items + n;
@@ -107,7 +114,8 @@ void menu_get_item_string(MENU *m, char *str, uint8_t n) {
 
 }
 
-void menu_whole_solo_string(MENU *m, char *s) {
+void menu_whole_solo_string(MENU *m, char *s)
+{
     char tmp_string[21];
     menu_item *p_to_item = get_p_to_item(m);
     menu_get_item_string(m, tmp_string, m->curr_pos);
@@ -130,7 +138,8 @@ void menu_whole_solo_string(MENU *m, char *s) {
     memcpy(s + 42 + value_length + 1, p_to_item->units, strlen(p_to_item->units));
 }
 
-void menu_whole_string(MENU *m, char *s, STATE state) {
+void menu_whole_string(MENU *m, char *s, STATE state)
+{
     if(state == EDIT) {
         menu_whole_solo_string(m, s);
     }
@@ -146,7 +155,8 @@ void menu_whole_string(MENU *m, char *s, STATE state) {
 
 }
 
-void menu_create_item(menu_item *item, const char *short_name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val, void *getter) {
+void menu_create_item(menu_item *item, const char *short_name, enum VAR_TYPE typ, const char *units, void *p_variable, float min_val, float max_val, void *getter)
+{
 
     strcpy(item->name, short_name);
     strcpy(item->units, units);
@@ -157,7 +167,8 @@ void menu_create_item(menu_item *item, const char *short_name, enum VAR_TYPE typ
     item->getter = getter;
 }
 
-void menu_increment_item(MENU *m) {
+void menu_increment_item(MENU *m)
+{
     switch(m->items[m->curr_pos].type) {
         case TYPE_SAVE:
         case TYPE_BAR:
@@ -184,7 +195,8 @@ void menu_increment_item(MENU *m) {
             break;
     }
 }
-void menu_decrement_item(MENU *m) {
+void menu_decrement_item(MENU *m)
+{
     switch(m->items[m->curr_pos].type) {
         case TYPE_SAVE:
         case TYPE_CONFIRM:
@@ -213,6 +225,7 @@ void menu_decrement_item(MENU *m) {
             break;
     }
 }
-void menu_swap(MENU **dest, MENU *src) {
+void menu_swap(MENU **dest, MENU *src)
+{
     *dest = src;
 }

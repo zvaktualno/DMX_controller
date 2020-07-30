@@ -16,7 +16,8 @@
 #include "i2c_fs.h"
 
 //AC sync bug: https://borkedlabs.com/blog/2017/10-12-samc21-ac-comparator-sync/
-typedef enum {
+typedef enum
+{
     TRIGGER,
     DMX,
     BOTH
@@ -37,19 +38,24 @@ void get_menu_dmx_ch_string(char *dest, uint8_t num);
 void get_menu_confirm_string(char *dest, uint8_t num);
 void device_factory_reset(void);
 
-void NMI_Handler(void) {
+void NMI_Handler(void)
+{
     BREAKPOINT;
 }
-void HardFault_Handler(void) {
+void HardFault_Handler(void)
+{
     BREAKPOINT;
 }
-void SVC_Handler(void) {
+void SVC_Handler(void)
+{
     BREAKPOINT;
 }
-void PendSV_Handler(void) {
+void PendSV_Handler(void)
+{
     BREAKPOINT;
 }
-void SysTick_Handler(void) {
+void SysTick_Handler(void)
+{
     BREAKPOINT;
 }
 
@@ -74,7 +80,8 @@ uint8_t key_pressed = 0;
 channel *p_to_channels[5];
 uint8_t lsave = 0, ssave = 0, format = 0, fac_reset = 0;
 
-int main(void) {
+int main(void)
+{
     system_init();
     delay_init();
     Disable_global_interrupt();
@@ -89,19 +96,18 @@ int main(void) {
     configure_dac_channel();
     configure_USB();
     configure_DMX();
-    configure_tc0();
+    configure_tc1();
     dac_enable(&dac_instance);
 
     configure_tcc0();
     configure_tcc0_callbacks(adsr_channels);
     configure_adc0(trigger_channels);
-    delay_ms(2000);
     lcd_begin();
-    delay_ms(100); //wait for LCD to set up
+    delay_ms(1); //wait for LCD to set up
     lcd_noCursor();
-    delay_ms(50);
+    delay_ms(1);
     lcd_create_bar_charts();
-    delay_ms(50);
+    delay_ms(1);
     lcd_create_arrow();
     NVIC_SetPriority(SERCOM3_IRQn, 6);
     NVIC_SetPriority(AC_IRQn, 4);
@@ -150,9 +156,8 @@ int main(void) {
 
     for (uint16_t i = 0; i < (MAX_DMX_CHANNELS / 16); i++) {
         char menu_item_short_name[10];
-        for (uint16_t j = 0; j < MENU_MAX_ITEMS - 1; j++) {
-
-            sprintf(menu_item_short_name, "DMX%d", i * MENU_MAX_ITEMS + j);
+        for (uint16_t j = 0; j < (MENU_MAX_ITEMS - 1); j++) {
+            sprintf(menu_item_short_name, "DMX%d", i * (MAX_DMX_CHANNELS / 16) + j);
             menu_create_item(&tmp_item, menu_item_short_name, TYPE_DMX_CH, "", dmx_values + i * 16 + j, -1, 256, get_menu_dmx_ch_string);
             menu_add_item(p_to_dmx_group_menus[i], tmp_item);
         }
@@ -218,11 +223,11 @@ int main(void) {
                 memory_full_format();
             }
             if(lsave) {
-                memory_load_preset(p_to_channels, dmx_values, lsave);
+                memory_load_preset(p_to_channels, &device_settings, dmx_values, lsave);
                 lsave = 0;
             }
             if(ssave) {
-                memory_write_preset(p_to_channels, dmx_values, ssave);
+                memory_write_preset(p_to_channels, &device_settings, dmx_values, ssave);
                 ssave = 0;
             }
             if(fac_reset) {
@@ -264,8 +269,7 @@ int main(void) {
 
         key_pressed = 1;
         if(millis() - encoder_timer > 1) {
-
-            encoder_timer = 0;
+            encoder_timer = millis();
             switch (get_encoder_status()) {
                 case BACKWARD:
                     for (uint8_t i = get_encoder_speed(); i > 0; i--)
@@ -316,7 +320,8 @@ int main(void) {
     }
 }
 
-MODE select_device_mode(uint8_t mode) {
+MODE select_device_mode(uint8_t mode)
+{
     switch (mode) {
         case 0:
             return DMX;
@@ -329,7 +334,8 @@ MODE select_device_mode(uint8_t mode) {
     }
 }
 
-void IO_init(void) {
+void IO_init(void)
+{
     //configure all ports!
     struct port_config input_pin_no_pullup;
     port_get_config_defaults(&input_pin_no_pullup);
@@ -389,21 +395,24 @@ void IO_init(void) {
     system_pinmux_pin_set_config(PIN_LCD_VO, &mux_config);
 }
 
-void configure_dac(void) {
+void configure_dac(void)
+{
     struct dac_config config_dac;
     dac_get_config_defaults(&config_dac);
     config_dac.reference = DAC_REFERENCE_AVCC;
     dac_init(&dac_instance, DAC, &config_dac);
 }
 
-void configure_dac_channel(void) {
+void configure_dac_channel(void)
+{
     struct dac_chan_config config_dac_chan;
     dac_chan_get_config_defaults(&config_dac_chan);
     dac_chan_set_config(&dac_instance, DAC_CHANNEL_0, &config_dac_chan);
     dac_chan_enable(&dac_instance, DAC_CHANNEL_0);
 }
 
-uint8_t button_handler(TIPKA t, STATE *s) {
+uint8_t button_handler(TIPKA t, STATE *s)
+{
 
     switch (t) {
         case BUTTON_1:
@@ -413,12 +422,10 @@ uint8_t button_handler(TIPKA t, STATE *s) {
                 menu_swap(&selected_menu, (MENU *)(get_p_to_item(selected_menu)->variable));
                 *s = SCROLL;
             }
-            else
-                if (*s == EDIT)
-                    *s = SCROLL;
-                else
-                    if (*s == SCROLL)
-                        *s = EDIT;
+            else if (*s == EDIT)
+                *s = SCROLL;
+            else if (*s == SCROLL)
+                *s = EDIT;
             return 2;
         default:
             return 0;
@@ -427,7 +434,8 @@ uint8_t button_handler(TIPKA t, STATE *s) {
     return 0;
 }
 
-void menu_draw(void) {
+void menu_draw(void)
+{
     char menu_string_array[4][21];
     for (uint8_t i = 0; i < 4; i++) {
         for (uint8_t j = 0; j < 20; j++)
@@ -441,7 +449,8 @@ void menu_draw(void) {
     }
 }
 
-void get_menu_mode_string(char *dest, uint8_t mode) {
+void get_menu_mode_string(char *dest, uint8_t mode)
+{
     switch(mode) {
         case 0:
             strcpy(dest, "DMX");
@@ -458,7 +467,8 @@ void get_menu_mode_string(char *dest, uint8_t mode) {
     }
 }
 
-void get_menu_bar_string(char *dest, uint8_t value) {
+void get_menu_bar_string(char *dest, uint8_t value)
+{
     char tmp_string[8];
     tmp_string[7] = 0;
     uint8_t col_size = 7;
@@ -466,16 +476,16 @@ void get_menu_bar_string(char *dest, uint8_t value) {
     for(uint8_t i = 0; i < col_size; i++) {
         if(tmp_value >= ((i + 1) * 5))
             * (tmp_string + i) = 5;
+        else if((tmp_value > (i * 5)) && (tmp_value <= (i * 5 + 5)) && (value != 0))
+            * (tmp_string + i) = tmp_value % 5;
         else
-            if((tmp_value > (i * 5)) && (tmp_value <= (i * 5 + 5)) && (value != 0))
-                * (tmp_string + i) = tmp_value % 5;
-            else
-                * (tmp_string + i) = ' ';
+            * (tmp_string + i) = ' ';
     }
     sprintf(dest, "%s", tmp_string);
 }
 
-void get_menu_enable_string(char *dest, uint8_t mode) {
+void get_menu_enable_string(char *dest, uint8_t mode)
+{
     switch(mode) {
         case 0:
             strcpy(dest, "OFF");
@@ -486,7 +496,8 @@ void get_menu_enable_string(char *dest, uint8_t mode) {
     }
 }
 
-void get_menu_dmx_ch_string(char *dest, uint8_t num) {
+void get_menu_dmx_ch_string(char *dest, uint8_t num)
+{
     uint8_t i;
     for(i = 0; i < 5; i++) {
         if(p_to_channels[i]->dmx_ch == num && p_to_channels[i]->enabled)break;
@@ -499,17 +510,18 @@ void get_menu_dmx_ch_string(char *dest, uint8_t num) {
     input_string[2] = '0' + p_to_channels[i]->input_channel;
     strcpy(dest, input_string);
 }
-void get_menu_confirm_string(char *dest, uint8_t num) {
+void get_menu_confirm_string(char *dest, uint8_t num)
+{
     if(num)
         strcpy(dest, "YES");
+    else if(state == SCROLL)
+        strcpy(dest, "");
     else
-        if(state == SCROLL)
-            strcpy(dest, "");
-        else
-            strcpy(dest, "NO");
+        strcpy(dest, "NO");
 
 }
-void device_factory_reset(void) {
+void device_factory_reset(void)
+{
     device_settings.mode = 2;
     for (uint16_t i = 0; i < sizeof(dmx_values); i++) {
         dmx_values[i] = 0;

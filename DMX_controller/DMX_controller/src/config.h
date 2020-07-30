@@ -66,7 +66,8 @@
 
 #define MUX_LCD_VO PINMUX_PA02B_DAC_VOUT
 #define LCD_ARROW_CHAR 7
-typedef struct {
+typedef struct
+{
     uint8_t level;
     uint8_t enabled;
     uint8_t dmx_ch;
@@ -77,27 +78,33 @@ typedef struct {
     uint8_t triggered;
 } channel;
 
-typedef enum {
+typedef enum
+{
     SCROLL,
     EDIT,
 } STATE ;
 
 
 
-typedef enum {
+typedef enum
+{
     BUTTON_NONE,
     BUTTON_1,
     BUTTON_2,
 } TIPKA;
 
-typedef struct {
+typedef struct
+{
     uint8_t contrast;
     uint8_t brightness;
-    uint8_t fixture_size;
     uint8_t mode;
 } SETTINGS;
 
-typedef struct {
+typedef struct
+{
+    uint8_t contrast;
+    uint8_t brightness;
+    uint8_t mode;
     uint16_t position;
     uint8_t channels[256];
     uint8_t level[5];

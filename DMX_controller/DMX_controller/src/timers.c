@@ -14,18 +14,21 @@ volatile uint32_t encoder_timer = 0;
 volatile uint32_t last_tick_time = 0;
 ENCODER encoder;
 ENCODER_POS encoder_pos;
-uint32_t millis(void) {
+uint32_t millis(void)
+{
     return proc_millis;
 }
 
-ENCODER get_encoder_status(void) {
+ENCODER get_encoder_status(void)
+{
     ENCODER tmp_status = encoder;
     encoder = IDLE;
     return tmp_status;
 
 }
 
-void process_encoder(void) {
+void process_encoder(void)
+{
     uint8_t status = 0;
     status |= (!port_pin_get_input_level(PIN_ENC_B)) << 0;
     status |= (!port_pin_get_input_level(PIN_ENC_A)) << 1;
@@ -61,7 +64,8 @@ void process_encoder(void) {
     }
 }
 
-void configure_tcc0(void) {
+void configure_tcc0(void)
+{
     struct tcc_config config_tcc;
     tcc_get_config_defaults(&config_tcc, TCC0);
 
@@ -74,7 +78,8 @@ void configure_tcc0(void) {
     tcc_enable(&tcc0_instance);
 }
 
-void configure_tcc0_callbacks(ADSR *adsr) {
+void configure_tcc0_callbacks(ADSR *adsr)
+{
     tcc_register_callback(&tcc0_instance, timer0_compare_callback, TCC_CALLBACK_OVERFLOW);
     tcc_enable_callback(&tcc0_instance, TCC_CALLBACK_OVERFLOW);
     a0 = adsr + 0;
@@ -84,7 +89,8 @@ void configure_tcc0_callbacks(ADSR *adsr) {
     a4 = adsr + 4;
 }
 
-void timer0_compare_callback(struct tcc_module *const module_inst) {
+void timer0_compare_callback(struct tcc_module *const module_inst)
+{
     adsr_process(a0);
     adsr_process(a1);
     adsr_process(a2);
@@ -93,14 +99,16 @@ void timer0_compare_callback(struct tcc_module *const module_inst) {
     proc_millis++;
     process_encoder();
 }
-uint8_t get_encoder_speed(void) {
+uint8_t get_encoder_speed(void)
+{
     if(encoder_timer > 30)return 1;
     if(encoder_timer > 20)return 3;
     if(encoder_timer > 10)return 5;
     return 30;
 }
 
-void configure_tc0(void) {
+void configure_tc1(void)
+{
     struct tc_config config_tc;
     tc_get_config_defaults(&config_tc);
 
@@ -118,7 +126,8 @@ void configure_tc0(void) {
     tc_enable(&tc1_instance);
 }
 
-void set_brightness(uint8_t brightness) {
+void set_brightness(uint8_t brightness)
+{
     brightness *= 4;
     tc_set_compare_value(&tc1_instance, TC_COMPARE_CAPTURE_CHANNEL_1, brightness);
 }
