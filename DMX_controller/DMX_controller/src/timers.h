@@ -11,6 +11,7 @@ typedef enum {
     POS_NONE,
     POS_A,
     POS_B,
+    POS_BOTH,
 } ENCODER_POS;
 void configure_tcc0(void);
 void configure_tcc0_callbacks(ADSR *adsr);

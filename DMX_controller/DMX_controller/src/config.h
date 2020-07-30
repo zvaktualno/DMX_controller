@@ -98,7 +98,6 @@ typedef struct {
 } SETTINGS;
 
 typedef struct {
-    char preset_name[10];
     uint16_t position;
     uint8_t channels[256];
     uint8_t level[5];
@@ -113,4 +112,5 @@ typedef struct {
     uint32_t sustain_level[5];
     uint32_t release[5];
 } PRESET;
+
 #endif

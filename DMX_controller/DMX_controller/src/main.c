@@ -210,6 +210,7 @@ int main(void) {
     uint8_t prev_compare_vals[5] = {0, 0, 0, 0, 0};
     //memory_load_preset(p_to_channels, dmx_values, 0);
     menu_draw();
+    uint32_t encoder_timer = 0;
     while (1) {
         if(state == SCROLL) {
             if(format == 1) {
@@ -229,22 +230,23 @@ int main(void) {
                 fac_reset = 0;
             }
         }
-        for(uint8_t i = 0; i < 3; i++) {
-            if(p_to_channels[i]->level != prev_compare_vals[i]) {
-                prev_compare_vals[i] = p_to_channels[i]->level;
-                switch(i) {
-                    case 0:
-                        ac_set_scaler(2, p_to_channels[i]->level);
-                        break;
-                    case 1:
-                        ac_set_scaler(0, p_to_channels[i]->level);
-                        break;
-                    case 2:
-                        ac_set_scaler(1, p_to_channels[i]->level);
-                        break;
+        if(key_pressed)
+            for(uint8_t i = 0; i < 3; i++) {
+                if(p_to_channels[i]->level != prev_compare_vals[i]) {
+                    prev_compare_vals[i] = p_to_channels[i]->level;
+                    switch(i) {
+                        case 0:
+                            ac_set_scaler(2, p_to_channels[i]->level);
+                            break;
+                        case 1:
+                            ac_set_scaler(0, p_to_channels[i]->level);
+                            break;
+                        case 2:
+                            ac_set_scaler(1, p_to_channels[i]->level);
+                            break;
+                    }
                 }
             }
-        }
 
         if (device_settings.contrast != prev_contrast) {
             prev_contrast = device_settings.contrast;
@@ -261,27 +263,32 @@ int main(void) {
         }
 
         key_pressed = 1;
-        switch (get_encoder_status()) {
-            case BACKWARD:
-                for (uint8_t i = get_encoder_speed(); i > 0; i--)
-                    if (state == SCROLL) {
-                        decrement_menu_position(selected_menu);
-                    }
-                    else
-                        menu_decrement_item(selected_menu);
-                break;
-            case FORWARD:
-                for (uint8_t i = get_encoder_speed(); i > 0; i--)
-                    if (state == SCROLL) {
-                        increment_menu_position(selected_menu);
-                    }
-                    else
-                        menu_increment_item(selected_menu);
-                break;
-            default:
-                key_pressed = 0;
-                break;
+        if(millis() - encoder_timer > 1) {
+
+            encoder_timer = 0;
+            switch (get_encoder_status()) {
+                case BACKWARD:
+                    for (uint8_t i = get_encoder_speed(); i > 0; i--)
+                        if (state == SCROLL) {
+                            decrement_menu_position(selected_menu);
+                        }
+                        else
+                            menu_decrement_item(selected_menu);
+                    break;
+                case FORWARD:
+                    for (uint8_t i = get_encoder_speed(); i > 0; i--)
+                        if (state == SCROLL) {
+                            increment_menu_position(selected_menu);
+                        }
+                        else
+                            menu_increment_item(selected_menu);
+                    break;
+                default:
+                    key_pressed = 0;
+                    break;
+            }
         }
+
 
         if (millis() - read_button_timer > 2) {
             read_button_timer = millis();

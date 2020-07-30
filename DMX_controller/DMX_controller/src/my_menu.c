@@ -97,7 +97,7 @@ void menu_get_item_string(MENU *m, char *str, uint8_t n) {
     }
     else {
         if(n == m->curr_pos) {
-            sprintf(item_str + 1, "%c%-10s%7s%2s", LCD_ARROW_CHAR, tmp->name, tmp->val_str, tmp->units);
+            sprintf(item_str, "%c%-10s%7s%2s", LCD_ARROW_CHAR, tmp->name, tmp->val_str, tmp->units);
         }
         else
             sprintf(item_str, "%-10s%8s%2s", tmp->name, tmp->val_str, tmp->units);

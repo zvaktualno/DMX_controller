@@ -19,9 +19,10 @@ uint32_t millis(void) {
 }
 
 ENCODER get_encoder_status(void) {
-    return encoder;
-    encoder_pos = POS_NONE;
+    ENCODER tmp_status = encoder;
     encoder = IDLE;
+    return tmp_status;
+
 }
 
 void process_encoder(void) {
@@ -30,39 +31,36 @@ void process_encoder(void) {
     status |= (!port_pin_get_input_level(PIN_ENC_A)) << 1;
 
     switch(status) {
-        case 0:
-            encoder_pos = POS_NONE;
-            encoder = IDLE;
 
+        case 0:
             break;
         case 1:
-            if(encoder_pos == POS_NONE) {
-                encoder_pos = POS_A;
+            if(encoder_pos == POS_BOTH) {
+
+                encoder = FORWARD;
                 encoder_timer = millis() - last_tick_time;
                 last_tick_time = millis();
+
             }
-            if(encoder_pos == POS_B) {
-                encoder_pos = POS_NONE;
-                encoder = FORWARD;
-            }
+            encoder_pos = POS_A;
+
             break;
         case 2:
-            if(encoder_pos == POS_NONE) {
-                encoder_pos = POS_B;
+            if(encoder_pos == POS_BOTH) {
+
+                encoder = BACKWARD;
                 encoder_timer = millis() - last_tick_time;
                 last_tick_time = millis();
+            }
+            encoder_pos = POS_B;
 
-            }
-            if(encoder_pos == POS_A) {
-                encoder_pos = POS_NONE;
-                encoder = BACKWARD;
-            }
             break;
-        default:
+        case 3:
+            encoder_pos = POS_BOTH;
             break;
     }
-
 }
+
 void configure_tcc0(void) {
     struct tcc_config config_tcc;
     tcc_get_config_defaults(&config_tcc, TCC0);
@@ -96,10 +94,10 @@ void timer0_compare_callback(struct tcc_module *const module_inst) {
     process_encoder();
 }
 uint8_t get_encoder_speed(void) {
-    if(encoder_timer > 20)return 1;
-    if(encoder_timer > 15)return 2;
-    if(encoder_timer > 10)return 3;
-    return 4;
+    if(encoder_timer > 30)return 1;
+    if(encoder_timer > 20)return 3;
+    if(encoder_timer > 10)return 5;
+    return 30;
 }
 
 void configure_tc0(void) {
