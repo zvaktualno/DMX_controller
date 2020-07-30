@@ -42,5 +42,5 @@ void menu_increment_item(MENU *m);
 void menu_decrement_item(MENU *m);
 void menu_swap(MENU **dest, MENU *src);
 void menu_whole_solo_string(MENU *m, char *s);
-
+void ftoe(char *s, float val);
 #endif

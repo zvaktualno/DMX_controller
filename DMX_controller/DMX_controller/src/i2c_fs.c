@@ -174,11 +174,13 @@ void memory_write_preset(channel **ch, uint8_t *dmx_ch, uint8_t pos) {
 }
 void memory_get_preset_name(char *dest, uint8_t num) {
     PRESET preset;
-    if(num == 0)
-        return sprintf(dest, "");
-
+    if(num == 0) {
+        sprintf(dest, "");
+        return;
+    }
     if(!read_memory(&preset, num))
-        return sprintf(dest, "EMPTY %d", num);
+        sprintf(dest, "EMPTY %d", num);
     else
-        return sprintf(dest, "SAVE %d", num);
+        sprintf(dest, "SAVE %d", num);
+    return;
 }

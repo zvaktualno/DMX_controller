@@ -26,7 +26,7 @@ MODE device_mode;
 MODE select_device_mode(uint8_t mode);
 void configure_dac(void);
 void configure_dac_channel(void);
-void button_handler(TIPKA t, STATE *s);
+uint8_t button_handler(TIPKA t, STATE *s);
 void menu_draw(void);
 void get_menu_mode_string(char *dest, uint8_t mode);
 struct dac_module dac_instance;
@@ -70,7 +70,7 @@ MENU *p_to_menus[5] = {&channel1_menu, &channel2_menu, &channel3_menu, &channel4
 STATE state = SCROLL;
 SETTINGS device_settings = {.contrast = 8, .brightness = 16};
 MENU *selected_menu = &main_menu;
-uint8_t key_pressed = 1;
+uint8_t key_pressed = 0;
 channel *p_to_channels[5];
 uint8_t lsave = 0, ssave = 0, format = 0, fac_reset = 0;
 
@@ -91,15 +91,18 @@ int main(void) {
     configure_DMX();
     configure_tc0();
     dac_enable(&dac_instance);
-    lcd_create_bar_charts();
+
     configure_tcc0();
     configure_tcc0_callbacks(adsr_channels);
     configure_adc0(trigger_channels);
-
+    delay_ms(2000);
     lcd_begin();
     delay_ms(100); //wait for LCD to set up
     lcd_noCursor();
-
+    delay_ms(50);
+    lcd_create_bar_charts();
+    delay_ms(50);
+    lcd_create_arrow();
     NVIC_SetPriority(SERCOM3_IRQn, 6);
     NVIC_SetPriority(AC_IRQn, 4);
     NVIC_SetPriority(ADC0_IRQn, 5);
@@ -206,6 +209,7 @@ int main(void) {
     uint32_t send_data_timer = 0, read_button_timer = 0;
     uint8_t prev_compare_vals[5] = {0, 0, 0, 0, 0};
     //memory_load_preset(p_to_channels, dmx_values, 0);
+    menu_draw();
     while (1) {
         if(state == SCROLL) {
             if(format == 1) {
@@ -241,6 +245,7 @@ int main(void) {
                 }
             }
         }
+
         if (device_settings.contrast != prev_contrast) {
             prev_contrast = device_settings.contrast;
             dac_chan_write(&dac_instance, DAC_CHANNEL_0, (device_settings.contrast << 5));
@@ -280,11 +285,8 @@ int main(void) {
 
         if (millis() - read_button_timer > 2) {
             read_button_timer = millis();
-            button_handler(button_read(), &state);
+            key_pressed = button_handler(button_read(), &state);
         }
-
-        if (port_pin_get_input_level(PIN_SW1) == 0)
-            adsr_trigger(adsr_channels + 0);
 
         if (millis() - send_data_timer > 20) {
             send_data_timer = millis();
@@ -390,17 +392,15 @@ void configure_dac(void) {
 void configure_dac_channel(void) {
     struct dac_chan_config config_dac_chan;
     dac_chan_get_config_defaults(&config_dac_chan);
-
     dac_chan_set_config(&dac_instance, DAC_CHANNEL_0, &config_dac_chan);
-
     dac_chan_enable(&dac_instance, DAC_CHANNEL_0);
 }
 
-void button_handler(TIPKA t, STATE *s) {
-    key_pressed = 1;
+uint8_t button_handler(TIPKA t, STATE *s) {
+
     switch (t) {
         case BUTTON_1:
-            break;
+            return 1;
         case BUTTON_2:
             if (get_p_to_item(selected_menu)->type == TYPE_MENU) {
                 menu_swap(&selected_menu, (MENU *)(get_p_to_item(selected_menu)->variable));
@@ -412,12 +412,12 @@ void button_handler(TIPKA t, STATE *s) {
                 else
                     if (*s == SCROLL)
                         *s = EDIT;
-            break;
+            return 2;
         default:
-            key_pressed = 0;
+            return 0;
             break;
     }
-    return;
+    return 0;
 }
 
 void menu_draw(void) {

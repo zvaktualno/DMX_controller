@@ -39,12 +39,12 @@ void lcd_begin(void) {
     lcd_home();
 }
 
-void lcd_clear() {
+void lcd_clear(void) {
     lcd_command(LCD_CLEARDISPLAY);
     delay_us(3);
 }
 
-void lcd_home() {
+void lcd_home(void) {
     lcd_command(LCD_RETURNHOME);
     delay_us(3);
 }
@@ -54,12 +54,6 @@ void lcd_setCursor(uint8_t col, uint8_t row) {
     if (row > 3 || col > 19)
         return;
     lcd_command(LCD_SETDDRAMADDR | (col + row_offsets[row]));
-}
-
-// Turn the display on/off (quickly)
-void lcd_noDisplay(void) {
-    _displaycontrol &= ~LCD_DISPLAYON;
-    lcd_command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
 void lcd_display(void) {
@@ -72,62 +66,17 @@ void lcd_noCursor(void) {
     lcd_command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
-void lcd_cursor(void) {
-    _displaycontrol |= LCD_CURSORON;
-    lcd_command(LCD_DISPLAYCONTROL | _displaycontrol);
-}
-
-// Turn on and off the blinking cursor
 void noBlink(void) {
     _displaycontrol &= ~LCD_BLINKON;
     lcd_command(LCD_DISPLAYCONTROL | _displaycontrol);
 }
 
-void blink(void) {
-    _displaycontrol |= LCD_BLINKON;
-    lcd_command(LCD_DISPLAYCONTROL | _displaycontrol);
-}
-
-// These commands scroll the display without changing the RAM
-void lcd_scrollDisplayLeft(void) {
-    lcd_command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVELEFT);
-}
-
-void lcd_scrollDisplayRight(void) {
-    lcd_command(LCD_CURSORSHIFT | LCD_DISPLAYMOVE | LCD_MOVERIGHT);
-}
-
-// This is for text that flows Left to Right
-void lcd_leftToRight(void) {
-    _displaymode |= LCD_ENTRYLEFT;
-    lcd_command(LCD_ENTRYMODESET | _displaymode);
-}
-
-// This is for text that flows Right to Left
-void lcd_rightToLeft(void) {
-    _displaymode &= ~LCD_ENTRYLEFT;
-    lcd_command(LCD_ENTRYMODESET | _displaymode);
-}
-
-// This will 'right justify' text from the cursor
-void lcd_autoscroll(void) {
-    _displaymode |= LCD_ENTRYSHIFTINCREMENT;
-    lcd_command(LCD_ENTRYMODESET | _displaymode);
-}
-
-// This will 'left justify' text from the cursor
-void lcd_noAutoscroll(void) {
-    _displaymode &= ~LCD_ENTRYSHIFTINCREMENT;
-    lcd_command(LCD_ENTRYMODESET | _displaymode);
-}
-
-// Allows us to fill the first 8 CGRAM locations
-// with custom characters
-void lcd_createChar(uint8_t location, uint8_t charmap[]) {
-    location &= 0x7; // we only have 8 locations 0-7
+void lcd_createChar(uint8_t location, uint8_t *char_arr) {
+    if(location > 7)
+        return;
     lcd_command(LCD_SETCGRAMADDR | (location << 3));
     for (int i = 0; i < 8; i++) {
-        lcd_write(charmap[i]);
+        lcd_write(char_arr[i]);
     }
 }
 
@@ -155,19 +104,14 @@ void lcd_write8bits(uint8_t value) {
     port_pin_set_output_level(PIN_LCD_D5, (value >> 5) & 0x01);
     port_pin_set_output_level(PIN_LCD_D6, (value >> 6) & 0x01);
     port_pin_set_output_level(PIN_LCD_D7, (value >> 7) & 0x01);
-    lcd_pulseEnable();
+    lcd_pulse_enable();
 }
 
-void lcd_pulseEnable(void) {
+void lcd_pulse_enable(void) {
     port_pin_set_output_level(PIN_LCD_EN, 1);
     delay_us(1);
     port_pin_set_output_level(PIN_LCD_EN, 0);
     delay_us(50);
-}
-
-
-void lcd_setBacklight(uint8_t new_val) {
-    /*manka*/
 }
 
 void lcd_printstr(char *str) {
@@ -186,4 +130,9 @@ void lcd_create_bar_charts(void) {
         }
         lcd_createChar(i + 1, char_arr);
     }
+}
+void lcd_create_arrow(void) {
+    uint8_t arrow_arr[8] = {0, 0x4, 0x2, 0x1F, 0x2, 0x4, 0, 0};
+
+    lcd_createChar(LCD_ARROW_CHAR, arrow_arr);
 }

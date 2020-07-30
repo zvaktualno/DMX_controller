@@ -44,25 +44,16 @@ void lcd_begin(void);
 void lcd_clear(void);
 void lcd_home(void);
 void lcd_setCursor(uint8_t col, uint8_t row);
-void lcd_noDisplay(void);
 void lcd_display(void);
 void lcd_noCursor(void);
-void lcd_cursor(void);
 void noBlink(void);
-void blink(void);
-void lcd_scrollDisplayLeft(void);
-void lcd_scrollDisplayRight(void);
-void lcd_leftToRight(void);
-void lcd_rightToLeft(void);
-void lcd_autoscroll(void);
-void lcd_noAutoscroll(void);
-void lcd_createChar(uint8_t location, uint8_t charmap[]);
+void lcd_createChar(uint8_t location, uint8_t *char_arr);
 void lcd_command(uint8_t value);
 void lcd_write(uint8_t value);
 void lcd_send(uint8_t value, uint8_t mode);
 void lcd_write8bits(uint8_t value);
-void lcd_pulseEnable(void);
+void lcd_pulse_enable(void);
 void lcd_printstr(char *str);
 void lcd_create_bar_charts(void);
-
+void lcd_create_arrow(void);
 #endif

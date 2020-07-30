@@ -7,7 +7,7 @@
 volatile uint8_t adc0_read_done_flag;
 channel *ch0, *ch1, *ch2, *ch3, *ch4;
 uint8_t adc_ch = 0;
-int16_t result[5];
+uint16_t result[5];
 struct adc_module adc0_instance;
 static struct ac_module ac_instance;
 
@@ -38,7 +38,7 @@ void configure_adc0(channel *p_to_ch) {
     adc_enable(&adc0_instance);
     adc0_change_channel(adc_ch);
     configure_adc0_callbacks();
-    adc_read_buffer_job(&adc0_instance, &result, 1);
+    adc_read_buffer_job(&adc0_instance, result, 1);
 
 }
 

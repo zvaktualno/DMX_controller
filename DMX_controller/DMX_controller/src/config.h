@@ -65,7 +65,7 @@
 
 
 #define MUX_LCD_VO PINMUX_PA02B_DAC_VOUT
-
+#define LCD_ARROW_CHAR 7
 typedef struct {
     uint8_t level;
     uint8_t enabled;

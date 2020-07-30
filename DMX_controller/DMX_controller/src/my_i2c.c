@@ -12,6 +12,8 @@ uint8_t i2c_rx_buffer[sizeof(PRESET) + 10];
 
 struct i2c_master_packet rd_packet, wr_packet;
 struct i2c_master_module i2c_master_instance;
+static void i2c_read_complete_callback(struct i2c_master_module *const module);
+static void i2c_write_complete_callback(struct i2c_master_module *const module);
 
 void i2c_write_complete_callback(struct i2c_master_module *const module) {
     i2c_write_is_complete = 1;
