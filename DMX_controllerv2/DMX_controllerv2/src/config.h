@@ -75,7 +75,7 @@
 typedef struct {
     uint8_t level;
     uint8_t enabled;
-    uint32_t dmx_ch;
+    uint8_t dmx_ch;
     uint8_t input_channel;
     uint8_t midi_ch;
     uint8_t note;
@@ -88,12 +88,7 @@ typedef enum {
     EDIT,
 } STATE ;
 
-typedef struct {
-    char preset_name[10];
-    uint16_t position;
-    uint8_t channels[512];
-    channel ch;
-} PRESET;
+
 
 typedef enum {
     BUTTON_NONE,
@@ -107,4 +102,21 @@ typedef struct {
     uint8_t fixture_size;
     uint8_t mode;
 } SETTINGS;
+
+typedef struct {
+    char preset_name[10];
+    uint16_t position;
+    uint8_t channels[256];
+    uint8_t level[5];
+    uint8_t enabled[5];
+    uint8_t dmx_ch[5];
+    uint8_t input_channel[5];
+    uint8_t midi_ch[5];
+    uint8_t note[5];
+    uint32_t attack[5];
+    uint32_t decay[5];
+    uint32_t sustain[5];
+    uint32_t sustain_level[5];
+    uint32_t release[5];
+} PRESET;
 #endif

@@ -6,7 +6,6 @@
 
 volatile uint8_t i2c_read_is_complete = 0;
 volatile uint8_t i2c_write_is_complete = 0;
-volatile uint8_t TWI_counter = 1;
 
 uint8_t i2c_tx_buffer[TWI_BUFFER_SIZE];
 uint8_t i2c_rx_buffer[sizeof(PRESET) + 10];
@@ -50,40 +49,37 @@ void configure_i2c(void) {
     i2c_master_enable(&i2c_master_instance);
     configure_i2c_callbacks();
 }
-void TWI_write(uint8_t address, uint8_t data_length, uint8_t *p_data) {
+
+void i2c_write(uint8_t address, uint8_t *p_data, uint8_t data_length) {
     wr_packet.address = address;
     wr_packet.data_length = data_length;
     wr_packet.data = p_data;
     i2c_write_is_complete = 0;
-    TWI_counter = 5;
+
 
     while(i2c_master_write_packet_job(&i2c_master_instance, &wr_packet) != STATUS_OK);
-
-    while(!i2c_write_is_complete && TWI_counter);
-    if(!TWI_counter) {
-        i2c_master_cancel_job(&i2c_master_instance);
-    }
+    while(!i2c_write_is_complete);
+    delay_ms(5); // Required for pagewrite refresh
 }
 
-enum status_code TWI_read(uint16_t send_address, uint8_t *send_data, uint16_t recieveBytes) {
-    TWI_counter = 5;//set timeout
-    rd_packet.address = send_address;
+void i2c_read(uint16_t address, uint8_t *p_data, uint16_t recieveBytes) {
+
+    i2c_write(address, p_data, 2);
+
+    rd_packet.address = address;
     rd_packet.data_length = recieveBytes;
     rd_packet.data = i2c_rx_buffer;
 
-    TWI_write(send_address, 2, send_data);
-
     i2c_read_is_complete = 0;
     while(i2c_master_read_packet_job(&i2c_master_instance, &rd_packet) != STATUS_OK);
-    while(!i2c_read_is_complete && TWI_counter);
-
-    return STATUS_OK;
+    while(!i2c_read_is_complete);
+    return;
 }
 
-uint8_t *I2C_get_tx_Buffer(void) {
+uint8_t *i2c_get_tx_Buffer(void) {
     return i2c_tx_buffer;
 }
 
-uint8_t *I2C_get_rx_Buffer(void) {
+uint8_t *i2c_get_rx_Buffer(void) {
     return i2c_rx_buffer;
 }

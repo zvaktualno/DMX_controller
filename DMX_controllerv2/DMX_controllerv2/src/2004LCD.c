@@ -182,7 +182,7 @@ void lcd_create_bar_charts(void) {
     }
     for(uint8_t i = 0; i < 5; i++) {
         for(uint8_t j = 0; j < 8; j++) {
-            char_arr[j] |= 1 << 5 - i;
+            char_arr[j] |= 1 << 4 - i;
         }
         lcd_createChar(i + 1, char_arr);
     }

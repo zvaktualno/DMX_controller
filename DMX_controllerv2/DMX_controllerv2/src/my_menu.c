@@ -69,6 +69,12 @@ void menu_get_item_string(MENU *m, char *str, uint8_t n) {
         case TYPE_PRESET:
             sprintf(tmp->val_str, "%s", "");
             break;
+        case TYPE_SAVE:
+            tmp->getter(tmp->val_str, *(uint8_t *)tmp->variable);
+            break;
+        case TYPE_CONFIRM:
+            tmp->getter(tmp->val_str, *(uint8_t *)tmp->variable);
+            break;
         case TYPE_DMX_CH:
             tmp->getter(tmp->val_str, (uint8_t *)tmp->variable - dmx_values);
             break;
@@ -80,7 +86,7 @@ void menu_get_item_string(MENU *m, char *str, uint8_t n) {
             sprintf(tmp->val_str, "%s", "ERROR99");
             break;
     }
-    *(tmp->val_str + 7) = 0;
+    *(tmp->val_str + 8) = 0;
     char item_str[21];
     if(strcmp(tmp->units, "") == 0) {
         if(n == m->curr_pos) {
@@ -153,7 +159,9 @@ void menu_create_item(menu_item *item, const char *short_name, enum VAR_TYPE typ
 
 void menu_increment_item(MENU *m) {
     switch(m->items[m->curr_pos].type) {
+        case TYPE_SAVE:
         case TYPE_BAR:
+        case TYPE_CONFIRM:
         case TYPE_DMX_CH:
         case TYPE_ENUM:
         case TYPE_UINT8:
@@ -178,6 +186,8 @@ void menu_increment_item(MENU *m) {
 }
 void menu_decrement_item(MENU *m) {
     switch(m->items[m->curr_pos].type) {
+        case TYPE_SAVE:
+        case TYPE_CONFIRM:
         case TYPE_BAR:
         case TYPE_ENUM:
         case TYPE_DMX_CH:
