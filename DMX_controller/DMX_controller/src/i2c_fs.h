@@ -25,7 +25,7 @@ void memory_format(void);
 
 uint8_t read_memory(PRESET *preset, uint8_t position);
 void write_memory(PRESET *preset, uint8_t position);
-void preset_delete(PRESET *preset);
+void memory_delete_save( uint8_t position);
 
 void memory_load_preset(channel **ch,SETTINGS *settings, uint8_t *dmx_ch, uint8_t pos);
 void memory_write_preset(channel **ch,SETTINGS *settings, uint8_t *dmx_ch, uint8_t pos);

@@ -16,7 +16,7 @@
 #  define CONF_CLOCK_XOSC_ENABLE                  true
 #  define CONF_CLOCK_XOSC_EXTERNAL_CRYSTAL        SYSTEM_CLOCK_EXTERNAL_CRYSTAL
 #  define CONF_CLOCK_XOSC_EXTERNAL_FREQUENCY      12000000UL
-#  define CONF_CLOCK_XOSC_STARTUP_TIME            SYSTEM_XOSC_STARTUP_32768 //maybe increase it to 32k
+#  define CONF_CLOCK_XOSC_STARTUP_TIME            SYSTEM_XOSC_STARTUP_2 //maybe increase it to 32k
 #  define CONF_CLOCK_XOSC_AUTO_GAIN_CONTROL       false
 #  define CONF_CLOCK_XOSC_ON_DEMAND               true
 #  define CONF_CLOCK_XOSC_RUN_IN_STANDBY          false
@@ -129,7 +129,7 @@
 #  define CONF_CLOCK_GCLK_7_ENABLE                true
 #  define CONF_CLOCK_GCLK_7_RUN_IN_STANDBY        false
 #  define CONF_CLOCK_GCLK_7_CLOCK_SOURCE          SYSTEM_CLOCK_SOURCE_OSC48M
-#  define CONF_CLOCK_GCLK_7_PRESCALER             1
+#  define CONF_CLOCK_GCLK_7_PRESCALER             100
 #  define CONF_CLOCK_GCLK_7_OUTPUT_ENABLE         false
 
 /* Configure GCLK generator 8 */

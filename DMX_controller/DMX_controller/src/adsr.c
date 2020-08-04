@@ -7,7 +7,8 @@
 uint8_t trigger_flags = 0;
 extern ADSR adsr_channels[5];
 
-void adsr_process(ADSR *adsr) {
+void adsr_process(ADSR *adsr)
+{
     if(adsr->debounce_timer >= adsr->interval)
         adsr->debounce_timer -= adsr->interval;
     else
@@ -84,11 +85,13 @@ void adsr_process(ADSR *adsr) {
             break;
     }
 }
-uint8_t adsr_get_value(ADSR *adsr) {
+uint8_t adsr_get_value(ADSR *adsr)
+{
     return adsr->value >> 24;
 }
 
-void adsr_trigger(ADSR *adsr) {
+void adsr_trigger(ADSR *adsr)
+{
     if(!adsr->debounce_timer) {
         adsr->debounce_timer = 100 / adsr->interval;
         adsr->state = START;
@@ -96,14 +99,17 @@ void adsr_trigger(ADSR *adsr) {
     }
 }
 
-uint8_t get_trigger_flags(void) {
+uint8_t get_trigger_flags(void)
+{
     return trigger_flags;
 }
 
-void clear_trigger_flags(void) {
+void clear_trigger_flags(void)
+{
     trigger_flags = 0;
 }
-void adsr_init(ADSR *adsr, uint32_t interval) {
+void adsr_init(ADSR *adsr, uint32_t interval)
+{
     adsr->attack_counter = 0;
     adsr->decay_counter = 0;
     adsr->sustain_counter = 0;

@@ -20,7 +20,7 @@ typedef enum
 {
     TRIGGER,
     DMX,
-    BOTH
+    BOTH,
 } MODE;
 
 MODE device_mode;
@@ -59,6 +59,8 @@ void SysTick_Handler(void)
     BREAKPOINT;
 }
 
+
+
 MENU main_menu = {.num_of_items = 0};
 MENU channel1_menu = {.num_of_items = 0};
 MENU channel2_menu = {.num_of_items = 0};
@@ -67,21 +69,25 @@ MENU channel4_menu = {.num_of_items = 0};
 MENU channel5_menu = {.num_of_items = 0};
 MENU settings_menu = {.num_of_items = 0};
 MENU static_channels_menu = {.num_of_items = 0};
+MENU *p_to_menus[5] = {&channel1_menu, &channel2_menu, &channel3_menu, &channel4_menu, &channel5_menu};
+MENU *selected_menu = &main_menu;
 
 uint8_t dmx_values[256];
 
 ADSR adsr_channels[5];
 channel trigger_channels[5];
-MENU *p_to_menus[5] = {&channel1_menu, &channel2_menu, &channel3_menu, &channel4_menu, &channel5_menu};
+
 STATE state = SCROLL;
 SETTINGS device_settings = {.contrast = 8, .brightness = 16};
-MENU *selected_menu = &main_menu;
+
 uint8_t key_pressed = 0;
 channel *p_to_channels[5];
-uint8_t lsave = 0, ssave = 0, format = 0, fac_reset = 0;
+uint8_t lsave = 0, ssave = 0, format = 0, fac_reset = 0,dsave=0;
 
+MENU m1,m2,m3,m4,m5,m6,m7,m8,m9,m10,m11,m12,m13,m14,m15,m16;
 int main(void)
 {
+
     system_init();
     delay_init();
     Disable_global_interrupt();
@@ -109,18 +115,16 @@ int main(void)
     lcd_create_bar_charts();
     delay_ms(1);
     lcd_create_arrow();
-    NVIC_SetPriority(SERCOM3_IRQn, 6);
-    NVIC_SetPriority(AC_IRQn, 4);
-    NVIC_SetPriority(ADC0_IRQn, 5);
+    NVIC_SetPriority(SERCOM3_IRQn,6);
+    NVIC_SetPriority(AC_IRQn, 5);
+    NVIC_SetPriority(ADC0_IRQn, 4);
     NVIC_SetPriority(DMX_IRQn, 2);
-    Enable_global_interrupt();
 
+    Enable_global_interrupt();
+    delay_ms(10);
     memory_init();
 
-    MENU *p_to_dmx_group_menus[16];
-    for (uint8_t i = 0; i < 16; i++) {
-        p_to_dmx_group_menus[i] = (MENU *)malloc(sizeof(MENU));
-    }
+    MENU *p_to_dmx_group_menus[16]= {&m1,&m2,&m3,&m4,&m5,&m6,&m7,&m8,&m9,&m10,&m11,&m12,&m13,&m14,&m15,&m16};
 
     menu_item tmp_item;
 
@@ -143,9 +147,11 @@ int main(void)
     menu_add_item(&settings_menu, tmp_item);
     menu_create_item(&tmp_item, "MODE", TYPE_ENUM, "", (void *)&device_settings.mode, 0, 2, get_menu_mode_string);
     menu_add_item(&settings_menu, tmp_item);
+    menu_create_item(&tmp_item, "SAVE", TYPE_SAVE, "", (void *)&ssave, 0, 16, memory_get_preset_name);
+    menu_add_item(&settings_menu, tmp_item);
     menu_create_item(&tmp_item, "LOAD SAVE", TYPE_SAVE, "", (void *)&lsave, 0, 16, memory_get_preset_name);
     menu_add_item(&settings_menu, tmp_item);
-    menu_create_item(&tmp_item, "SAVE", TYPE_SAVE, "", (void *)&ssave, 0, 16, memory_get_preset_name);
+    menu_create_item(&tmp_item, "DELETE SAVE", TYPE_SAVE, "", (void *)&dsave, 0, 16, memory_get_preset_name);
     menu_add_item(&settings_menu, tmp_item);
     menu_create_item(&tmp_item, "FORMAT", TYPE_CONFIRM, "", (void *)&format, 0, 1, get_menu_confirm_string);
     menu_add_item(&settings_menu, tmp_item);
@@ -204,16 +210,8 @@ int main(void)
     uint8_t prev_contrast = 0;
     uint8_t prev_brightness = 0;
 
-    for (uint16_t i = 0; i < sizeof(dmx_values); i++) {
-        dmx_values[i] = 0;
-    }
-
-
-    dmx_values[6] = 255;
-
     uint32_t send_data_timer = 0, read_button_timer = 0;
     uint8_t prev_compare_vals[5] = {0, 0, 0, 0, 0};
-    //memory_load_preset(p_to_channels, dmx_values, 0);
     menu_draw();
     uint32_t encoder_timer = 0;
     while (1) {
@@ -229,6 +227,10 @@ int main(void)
             if(ssave) {
                 memory_write_preset(p_to_channels, &device_settings, dmx_values, ssave);
                 ssave = 0;
+            }
+            if(dsave) {
+                memory_delete_save(dsave);
+                dsave=0;
             }
             if(fac_reset) {
                 device_factory_reset();
@@ -299,7 +301,7 @@ int main(void)
             key_pressed = button_handler(button_read(), &state);
         }
 
-        if (millis() - send_data_timer > 20) {
+        if (millis() - send_data_timer > 40) {
             send_data_timer = millis();
             device_mode = select_device_mode(device_settings.mode);
 
@@ -312,8 +314,10 @@ int main(void)
             }
             if (device_mode == TRIGGER || device_mode == BOTH) {
                 for(uint8_t i = 0; i < 5; i++)
-                    if((get_trigger_flags() >> i) & 0x1)
-                        MIDI_send_note_on(p_to_channels[i]->midi_ch, p_to_channels[i]->note, dmx_values[p_to_channels[i]->dmx_ch]);
+                    if((get_trigger_flags() >> i) & 0x1) {
+                        MIDI_send_note_on(p_to_channels[i]->midi_ch, p_to_channels[i]->note,255);
+                        MIDI_send_note_off(p_to_channels[i]->midi_ch, p_to_channels[i]->note,255);
+                    }
                 clear_trigger_flags();
             }
         }
@@ -415,8 +419,8 @@ uint8_t button_handler(TIPKA t, STATE *s)
 {
 
     switch (t) {
-        case BUTTON_1:
-            return 1;
+        /*case BUTTON_1:
+            return 1;*/
         case BUTTON_2:
             if (get_p_to_item(selected_menu)->type == TYPE_MENU) {
                 menu_swap(&selected_menu, (MENU *)(get_p_to_item(selected_menu)->variable));
@@ -437,15 +441,14 @@ uint8_t button_handler(TIPKA t, STATE *s)
 void menu_draw(void)
 {
     char menu_string_array[4][21];
-    for (uint8_t i = 0; i < 4; i++) {
-        for (uint8_t j = 0; j < 20; j++)
-            menu_string_array[i][j] = ' ';
-        menu_string_array[i][20] = 0;
-    }
+
     menu_whole_string(selected_menu, menu_string_array[0], state);
+
     for (uint8_t i = 0; i < 4; i++) {
         lcd_setCursor(0, i);
-        lcd_printstr(menu_string_array[i]);
+        for(uint8_t j = 0; j<20; j++) {
+            lcd_write(menu_string_array[i][j]);
+        }
     }
 }
 
@@ -505,7 +508,8 @@ void get_menu_dmx_ch_string(char *dest, uint8_t num)
             sprintf(dest, "%d", dmx_values[num]);
         }
     }
-    if(i == 5)return;
+    if(i == 5)
+        return;
     char input_string[] = "IN ";
     input_string[2] = '0' + p_to_channels[i]->input_channel;
     strcpy(dest, input_string);
@@ -535,11 +539,11 @@ void device_factory_reset(void)
         adsr_channels[i].sustain_level = 127;
         trigger_channels[i].adsr = adsr_channels + i;
         p_to_channels[i] = trigger_channels + i;
-        p_to_channels[i]->dmx_ch = i + 10;
+        p_to_channels[i]->dmx_ch = i*8+6;
         p_to_channels[i]->note = MIDI_NOTE_A4;
         p_to_channels[i]->midi_ch = i + 1;
         p_to_channels[i]->input_channel = i + 1;
-        p_to_channels[i]->enabled = 1;
+        p_to_channels[i]->enabled = 0;
         p_to_channels[i]->level = 16;
     }
 }

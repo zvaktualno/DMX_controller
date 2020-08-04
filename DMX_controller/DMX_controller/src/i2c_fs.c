@@ -76,11 +76,12 @@ uint8_t read_memory(PRESET *preset, uint8_t position)
 }
 
 /* Deletes the preset. */
-void preset_delete(PRESET *preset)
+void memory_delete_save( uint8_t position)
 {
-    fs.memory_map &= ~(1UL << preset->position);
+    fs.memory_map &= ~(1UL << position);
     write_memory_map();
 }
+
 void memory_full_format(void)
 {
     uint8_t null_array[66];
@@ -142,10 +143,11 @@ void write_memory(PRESET *preset, uint8_t position)
 void memory_load_preset(channel **ch,SETTINGS *settings, uint8_t *dmx_ch, uint8_t pos)
 {
     PRESET preset;
+    if(!read_memory(&preset, pos))
+        return;
     settings->contrast = preset.contrast;
     settings->brightness = preset.brightness;
     settings->mode=preset.mode;
-    if(!read_memory(&preset, pos))return;
     for(uint16_t i = 0; i < 256; i++) {
         *(dmx_ch + i) = *(preset.channels + i);
     }
